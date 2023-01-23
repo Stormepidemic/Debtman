@@ -1,0 +1,20 @@
+fileFormatVersion: 2
+guid: f7a0b098f06af9f4f9a49ab6f9bbfdec
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - PlayerBody: {instanceID: 0}
+  - armature: {instanceID: 0}
+  - animator: {instanceID: 0}
+  - mainModel: {instanceID: 0}
+  - spinModel: {instanceID: 0}
+  - manager: {fileID: 5488207015829268370, guid: bde33cb2f9173174b9a1af58e8af3c1a,
+      type: 3}
+  - particles: {instanceID: 0}
+  - spinParticles: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

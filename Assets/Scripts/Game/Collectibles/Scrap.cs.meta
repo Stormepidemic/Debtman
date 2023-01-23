@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 607e3388677418a478b94c6957eef424
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - manager: {fileID: 5488207015829268370, guid: bde33cb2f9173174b9a1af58e8af3c1a,
+      type: 3}
+  - collectedMaterial: {instanceID: 0}
+  - model: {instanceID: 0}
+  - trail: {instanceID: 0}
+  - sound: {instanceID: 0}
+  - shadow: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
