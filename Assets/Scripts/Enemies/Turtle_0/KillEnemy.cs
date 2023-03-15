@@ -14,40 +14,46 @@ public class KillEnemy : MonoBehaviour
     private GameObject parentObject;
     private Rigidbody parentBody;
     [SerializeField] private float flySpeed = 0.1f;
+    [SerializeField] private AudioSource sound;
     private Vector3 flyDirection;
 
     void Start(){
         parentObject = transform.parent.parent.gameObject;
         parentBody = transform.parent.parent.gameObject.GetComponent<Rigidbody>();
+        anim = enemy.GetComponent<Animator>();
     }
     void Update(){
-        if(flying == 1){
-        
-            float x = (float)(Random.value * 2.0);
-            float y = (float)Random.value;
-            float z = (float)(Random.value * 2.0);
-            parentBody.velocity = flyDirection*flySpeed;
-        }
     }
 
     void OnTriggerEnter(Collider other){ 
-        if(flying != 1){
-            if(other != null){ //This if-statement was here because for some reason the frame after the enemy should be killed, this causes a nullpointer exception.
-                if(!other.gameObject.GetComponent<PlayerMovement>().enemyImmunity){
-                    anim = enemy.GetComponent<Animator>();
-                    anim.SetBool("kill",true);
-                    enemy.GetComponent<Turtle_0>().isMoving(false);
-                    enemy.GetComponent<AudioSource>().Play(0);
-                    Destroy(hurtbox); //Destroy the hurtbox for the enemy
-                    Destroy(parentObject , killTime); //Destroy the enemy after 3 seconds
-                }else if(other.gameObject.GetComponent<PlayerMovement>().enemyImmunity){
-                    Destroy(hurtbox); //Destroy the hurtbox for the enemy
-                    flying = 1;
-                    contactPosition = other.gameObject.transform;
-                    flyDirection = -(contactPosition.position - gameObject.transform.position);
-                    Destroy(parentObject, killTime); //Destroy the enemy after 3 seconds
-                }
+        
+        if(other.gameObject.tag == "Player"){
+            if(!other.gameObject.GetComponent<PlayerMovement>().enemyImmunity){
+                kill();
+            }else if(other.gameObject.GetComponent<PlayerMovement>().enemyImmunity){
+                kill();
             }
         }
+        if(other.gameObject.tag == "Explosion"){
+            kill();
+        }
+    }
+
+    public void kill(){
+        //An animation event is used to prompt when the append this object to the list of 'destroyed' objects.
+        //See: KillEnemyAction.cs
+        anim.SetBool("kill",true); 
+        sound.Play();
+        hurtbox.SetActive(false); //Destroy the hurtbox for the enemy
+    }
+
+    public void Reset(){
+        anim.SetBool("kill", false);
+        //enemy.GetComponent<Enemy>().Reset();
+        hurtbox.SetActive(true);
+    }
+
+    public void Disable(){
+        enemy.SetActive(false);
     }
 }

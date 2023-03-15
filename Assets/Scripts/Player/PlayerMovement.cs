@@ -25,16 +25,17 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private int spinDelay = 30;
     public Boolean enemyImmunity = false;
     private Boolean isGrounded;
-    private Boolean sprinting;
     [SerializeField] private GameObject manager;
-    [SerializeField] private GameObject particles;
+    [SerializeField] private GameObject bodyParticles;
+    //[SerializeField] private GameObject landFromJumpParticles;
     [SerializeField] private GameObject spinParticles;
     [SerializeField] private float manualDrag;
-    [SerializeField] private Material[] damageStateMaterials;
-    private int damageState;
     [SerializeField] private int immunityTime; //How long the player should be invincible after taking damage
     [SerializeField] private int immunityCounter;
     private Vector3 previousDirection;
+    private Boolean alive = true; //If the player is alive or not...
+    [SerializeField] private int waitFrameCounter; //This counter is used in order to determine when a Waiting animation should play
+
     // Start is called before the first frame update
     void Awake()
     {
@@ -44,12 +45,14 @@ public class PlayerMovement : MonoBehaviour
     }
     
     void Update(){
+        manager = GameObject.Find("GameManager");
         if(Time.timeScale > 0){
             if(canMove){
             animator.SetBool("Spawn",false);
             HandleAnimator();
             HandleJump();
             HandleSpin();
+            HandleWaiting();
             }
 
             //Spin Logic
@@ -87,6 +90,16 @@ public class PlayerMovement : MonoBehaviour
         if(collision.gameObject.tag == "Ground"){
             gameObject.transform.SetParent(collision.gameObject.transform);
             isGrounded = true;
+        }
+    }
+
+    void OnTriggerEnter(Collider other){
+        if(other.gameObject.tag == "Explosion"){
+            if(alive){
+                manager.GetComponent<GameManager>().HandlePlayerDeath(); //KILL the player!
+                alive = false;
+            }
+            
         }
     }
     
@@ -172,6 +185,7 @@ public class PlayerMovement : MonoBehaviour
             if((hit.collider != null) && (hit.collider.tag == "Ground")){
                 float distanceFromGround = Math.Abs(hit.point.y - transform.position.y);
                 if(distanceFromGround < 0.12f){
+
                     isGrounded = true;
                     PlayerBody.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
                 }
@@ -217,56 +231,27 @@ public class PlayerMovement : MonoBehaviour
         animator.SetBool("Spawn",true);
         PlayerBody.useGravity = true;
         collider.enabled = true;
+        alive = true;
     }
-    // public void HandleSprint(){
-    //     if(Input.GetKey(KeyCode.LeftControl)){
-    //         if(manager.GetComponent<GameManager>().GetScore() > 0 && isGrounded){
-    //             manager.GetComponent<GameManager>().DecrementScore(1);
-    //             sprinting = true;
-    //             currentSpeed = sprintSpeed;
-    //         }
-    //     }else{
-    //         currentSpeed = speed;
-    //         sprinting = false;
-    //     }
-    // }
 
-    // private void SetDamageMaterial(){
-    //     mainModel.GetComponent<Renderer>().material = damageStateMaterials[damageState];
-    // }
-    // //Returns 0 if the player is in the base damage state, returns 1 if it can successfully move down a damage state (take damage without dying)
-    // public int DealDamage(){
-    //     int returnValue = 0;
-    //     if(immunityCounter == 0){
-    //         if(damageState > 0){
-    //             damageState = damageState - 1;
-    //             SetDamageMaterial();
-    //             returnValue = 1;
-    //             immunityCounter = immunityTime;
-    //     }else if(damageState == 0){
-    //         damageState = 0;
-    //         returnValue = 0;
-    //         print("damageState = " + damageState);
-    //         }
-    //     }
-        
-    //     return returnValue;
-    // }
-
-    // public int GetDamageState(){
-    //     return damageState;
-    // }
-
-    // public void SetDamageState(int state){
-    //     damageState = state;
-    //     SetDamageMaterial();
-    // }
-
-    // private void decrementImmunityTimer(){
-    //     if(immunityCounter > 0){
-    //         immunityCounter -= 1;
-    //     }else{
-    //         immunityCounter = 0;
-    //     }
-    // }
+    //This function is used to count and handle when/if a waiting animation should play
+    //A waiting animation should play when the Player hasn't moved for a considerable amount of time.
+    void HandleWaiting(){
+        int waitTime = 2400; //The amount of frames the Idle animation can play before the waiting animation will play
+        Boolean hasRun = animator.GetBool("Running");
+        Boolean hasJumped = animator.GetBool("Rising") || animator.GetBool("Falling");
+        Boolean hasDied = animator.GetBool("Spawn") || animator.GetBool("Death");
+        if((!hasRun && !hasJumped && !hasDied || (animator.GetInteger("Waiting") != 0))){
+            if(waitFrameCounter > waitTime){
+                waitFrameCounter = 0;
+                //LIKELY TO REPLACE LATER WITH A RANDOM SELECTON SYSTEM
+                animator.SetInteger("Waiting", 1);
+            }else{
+                waitFrameCounter++; //Increment the frame count
+            }
+        }else{
+            animator.SetInteger("Waiting", 0);
+            waitFrameCounter = 0; //Reset the timer
+        }
+    }
 }

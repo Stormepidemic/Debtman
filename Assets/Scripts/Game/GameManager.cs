@@ -20,15 +20,24 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject pauseScreen;
     [SerializeField] private bool paused;
     private int playerDamageState;
+    private List<GameObject>[] resetableObjects; //0 -> CollectiblesList, 1 -> DestructiblesList, 2 -> InteractablesList, 3 -> EnemiesList, 4 -> OtherList
     
 
     void Awake(){
         instance = this;
-        DontDestroyOnLoad(this.gameObject); //Keeps this object from ever being deleted between Scene changes
+        //I'll have to figure this one out later. Basically, reloading a current scene causes issues and makes multiple GameManagers. This is a problem.
+        //I think i could fix it by making a LevelManager handle most of this shit, and then GameManager be the singleton that runs the logic between levels and stuff...
+        //DontDestroyOnLoad(this.gameObject); //Keeps this object from ever being deleted between Scene changes
     }
     // Start is called before the first frame update
     void Start()
     {
+        resetableObjects = new List<GameObject>[6];
+        //Set up our list of objects
+        for(int i = 0; i < resetableObjects.Length; i++){
+            resetableObjects[i] = new List<GameObject>();
+        }
+
         deathBarriers = GameObject.FindGameObjectsWithTag("Death_Barrier");
     }
 
@@ -77,9 +86,11 @@ public class GameManager : MonoBehaviour
     }
 
     //Handles what happens when the player reaches a checkpoint
-    void HandleCheckpoint(GameObject PlayerCheckpoint, GameObject CameraCheckpoint){
+    public void HandleCheckpoint(GameObject PlayerCheckpoint, GameObject CameraCheckpoint){
         playerSpawn = PlayerCheckpoint;
         cameraSpawn = CameraCheckpoint;
+        UpdateResetableObjects();
+        print("HEREEEE!");
     }
 
     //Get the current score / scrap total
@@ -94,6 +105,7 @@ public class GameManager : MonoBehaviour
 
     //Handles what happens when the player dies
     public void HandlePlayerDeath(){
+        
         DecrementLives(1); //lives--;
         score = 0; //Reset the score to 0
         GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
@@ -129,6 +141,7 @@ public class GameManager : MonoBehaviour
         cams = GameObject.FindGameObjectsWithTag("MainCamera");
         cams[0].GetComponent<CameraMove>().centerCamera(); //recenters the main camera
         Reinstate();
+        ResetResetableObjects(); //Turn back on/reset all objects not saved upon a checkpoint
         StartCoroutine(HandleDeathFade("out"));
     }
 
@@ -153,7 +166,7 @@ public class GameManager : MonoBehaviour
     }
 
     //Set the player's spawn as well as a camera position for when the player respawns. 
-    public void SetPlayerSpawn(GameObject spawn, GameObject cameraPosition){
+    private void SetPlayerSpawn(GameObject spawn, GameObject cameraPosition){
         playerSpawn = spawn;
         cameraSpawn = cameraPosition;
     }
@@ -219,6 +232,89 @@ public class GameManager : MonoBehaviour
                 graphic.color = new Color(0, 0, 0, i);
                 yield return null;
             }
+        }
+    }
+
+    /*
+    This function more or less handles populating the resetableObjects 2d array. These objects
+    are then either marked as non-resetable when the player reaches a checkpoint, or are reset upon player death.
+    Basically, things that the player interacts with BEFORE a checkpoint should stay broken when a checkpoint happens,
+    but reset if they occur AFTER a checkpoint has been reached.
+    */
+    public void PopulateDisabledObjects(String type, GameObject obj){
+        //0 -> Collectibles[]
+        //1 -> Destructibles[]
+        //2 -> Interactables[]
+        //3 -> Enemies[]
+        //4 -> Explosive[]
+        //5 -> Other[]
+        switch(type){
+            case "collectible":
+                resetableObjects[0].Add(obj);
+                
+            break;
+
+            case "destructible":
+                resetableObjects[1].Add(obj);
+                obj.transform.parent.gameObject.SetActive(false);
+            break;
+
+            case "interactible":
+                resetableObjects[2].Add(obj);
+            break;
+
+            case "enemy":
+                resetableObjects[3].Add(obj);
+                obj.transform.parent.gameObject.SetActive(false);
+            break;
+
+            case "explosive":
+                resetableObjects[4].Add(obj);
+                obj.SetActive(false);
+            break;
+
+            case "other":
+            break;
+
+            default:
+            //Ill just leave this doing nothing for now
+            break;
+        }
+    }
+
+    //Handles re-enabling all of the objects that were messed with before the player died
+    private void ResetResetableObjects(){
+
+        foreach(GameObject item in resetableObjects[0]){ //COLLECTIBLE LIST
+            //Reset collectibles
+            
+        }
+        foreach(GameObject item in resetableObjects[1]){ //DESTRUCTIBLE
+            //Reset destructibles
+            item.transform.parent.gameObject.SetActive(true);
+            item.GetComponent<Destructible>().Reset();
+        }
+        foreach(GameObject item in resetableObjects[2]){ //INTERACTiBLE
+            //Reset interactibles
+            item.GetComponent<Interactible>().Deactivate();
+        }
+        foreach(GameObject item in resetableObjects[3]){ //ENEMY
+            //Reset enemies
+            item.transform.parent.gameObject.SetActive(true);
+            item.GetComponent<Enemy>().Reset();
+        }
+        foreach(GameObject item in resetableObjects[4]){ //EXPLOSIVE
+            //Reset explosives
+            item.SetActive(true);
+            item.GetComponent<Destructible>().Reset();
+        }
+    }
+
+    //When the player reaches a checkpoint, all resetable objects that have been activated since the last checkpoint should still be activated.
+    private void UpdateResetableObjects(){
+        //For now I'm just going to empty the resetableObjects structure so they never get reset in the level.
+        for(int i = 0; i < resetableObjects.Length; i++){
+            resetableObjects[i] = new List<GameObject>();
         }
     }
 

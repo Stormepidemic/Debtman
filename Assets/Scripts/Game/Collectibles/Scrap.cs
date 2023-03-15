@@ -22,7 +22,14 @@ public class Scrap : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        player = GameObject.FindGameObjectsWithTag("Target")[0];
+        material = model.GetComponent<Renderer>().material;
+        startingColor = material.color;
+        manager = GameObject.Find("GameManager");
+    }
+
+    void Awake(){
+        player = GameObject.FindGameObjectsWithTag("Target")[0];
         material = model.GetComponent<Renderer>().material;
         startingColor = material.color;
         manager = GameObject.Find("GameManager");
@@ -31,6 +38,8 @@ public class Scrap : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        player = GameObject.FindGameObjectsWithTag("Target")[0];
+        //print(player);
         if(!objectDestroyed){
             player = GameObject.FindGameObjectsWithTag("Target")[0];
             Vector3 adjustedPlayerPosition = new Vector3(player.transform.position.x, player.transform.position.y + offset, player.transform.position.z);

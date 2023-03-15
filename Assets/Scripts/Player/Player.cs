@@ -34,6 +34,9 @@ public class Player : MonoBehaviour
     private int damageState;
     [SerializeField] private int immunityTime; //How long the player should be invincible after taking damage
     [SerializeField] private int immunityCounter;
+
+    [SerializeField] private int waitFrameCounter; //This counter is used in order to determine when a Waiting animation should play
+
     // Start is called before the first frame update
     void Awake()
     {
@@ -49,6 +52,7 @@ public class Player : MonoBehaviour
             HandleAnimator();
             HandleJump();
             HandleSpin();
+            HandleWaiting();
             }
 
             //Spin Logic
@@ -147,7 +151,8 @@ public class Player : MonoBehaviour
         RaycastHit hit;
         Vector3 adjPosition = new Vector3(transform.position.x - 0.1f, transform.position.y, transform.position.z);
         Physics.Raycast(adjPosition, -Vector3.up, out hit, Mathf.Infinity);
-        if(Input.GetKeyDown(KeyCode.Space)){ //Jump
+        if(Input.GetAxis("Jump") > 0.0f){ //Jump
+        print("HELP!");
             if((hit.collider != null) && (hit.collider.tag == "Ground")){
                 float distanceFromGround = Math.Abs(hit.point.y - transform.position.y);
                 if(distanceFromGround < 0.05f){
@@ -164,7 +169,7 @@ public class Player : MonoBehaviour
 
     //Handles the player using the spin move
     public void HandleSpin(){
-        if(Input.GetKeyDown(KeyCode.LeftShift) && ((spinValue-30) > 0)){
+        if((Input.GetAxis("Spin")>0.0f) && ((spinValue-30) > 0)){
             spinValue = spinValue - 60;
             lastSpinFrame = playerFrameCounter;
             mainModel.SetActive(false);
@@ -195,6 +200,25 @@ public class Player : MonoBehaviour
         animator.SetBool("Spawn",true);
         PlayerBody.useGravity = true;
         collider.enabled = true;
+    }
+
+    //This function is used to count and handle when/if a waiting animation should play
+    //A waiting animation should play when the Player hasn't moved for a considerable amount of time.
+    void HandleWaiting(){
+        int waitTime = 120; //The amount of frames the Idle animation can play before the waiting animation will play
+        Boolean hasRun = animator.GetBool("Running");
+        Boolean hasJumped = animator.GetBool("Rising") || animator.GetBool("Falling");
+        Boolean hasDied = animator.GetBool("Spawn") || animator.GetBool("Death");
+        if(!hasRun && !hasJumped && !hasDied){
+            waitFrameCounter++; //Increment the frame count
+            if(waitFrameCounter > waitTime){
+                waitFrameCounter = 0;
+                //LIKELY TO REPLACE LATER WITH A RANDOM SELECTON SYSTEM
+                animator.SetInteger("Waiting", 1);
+            }
+        }else{
+            waitFrameCounter = 0; //Reset the timer
+        }
     }
     // public void HandleSprint(){
     //     if(Input.GetKey(KeyCode.LeftControl)){

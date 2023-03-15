@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DestroyDestructible : MonoBehaviour
+public class DestroyDestructible : Destructible
 {
     [SerializeField] private int scrapValue;
     [SerializeField] private GameObject model;
@@ -18,24 +18,40 @@ public class DestroyDestructible : MonoBehaviour
         anim = model.GetComponent<Animator>();
     }
     void OnTriggerEnter(Collider other){
-        if(other.gameObject.tag =="PlayerDealDamageToEnemy"){
+        if(other.gameObject.tag =="PlayerDealDamageToEnemy" || other.gameObject.tag == "Explosion"){
             anim.SetBool("Broken", true);
+            //Break();
+            gameObject.transform.parent.gameObject.GetComponent<Collider>().enabled = false; //Disables the hitbox
+            gameObject.GetComponent<Collider>().enabled = false; //Disable destroy box
+            sound.pitch = UnityEngine.Random.Range(0.75f + sound.pitch, 1.0f + sound.pitch);
+            particles.Play(); //Play the particle effects
+            sound.Play();
+            
             spawnCollectibles();
         }
-        gameObject.transform.parent.gameObject.GetComponent<Collider>().enabled = false; //Disables the hitbox
-        sound.pitch = UnityEngine.Random.Range(0.75f + sound.pitch, 1.0f + sound.pitch);
-        particles.Play(); //Play the particle effects
-        sound.Play();
-        Destroy(gameObject.GetComponent<Collider>());
-        Destroy(gameObject.transform.parent.gameObject, sound.clip.length); //Destroys the GameObject once the animation finishes
         
     }
 
-    private void spawnCollectibles(){
+    public override void spawnCollectibles(){
         for(int i = 0; i < scrapValue; i++){
             float x = Random.Range(0-collectibleSpread,collectibleSpread);
             float z = Random.Range(0-collectibleSpread,collectibleSpread);
             Instantiate(collectiblePrefab, new Vector3(transform.position.x + x,transform.position.y + yOffset,transform.position.z + z), Quaternion.identity);
         }
+    }
+
+    public override void Break(){
+        anim.SetBool("Broken", false);
+        GameObject.Find("GameManager").GetComponent<GameManager>().PopulateDisabledObjects("destructible", gameObject);
+        anim.Rebind();
+        anim.Update(0f);
+    }
+
+    public override void Reset(){
+        anim.SetBool("Broken", false);
+        gameObject.transform.parent.gameObject.GetComponent<Collider>().enabled = true;
+        gameObject.GetComponent<Collider>().enabled = true; //reenable destroy box
+        particles.Stop(); //Play the particle effects
+        sound.Stop();
     }
 }

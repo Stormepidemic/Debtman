@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-public class Turtle_0 : MonoBehaviour
+public class Turtle_0 : Enemy
 {
     public GameObject startPoint;
     public GameObject endPoint;
@@ -11,6 +11,7 @@ public class Turtle_0 : MonoBehaviour
     private Animator anim;
     public GameObject Turtle;
     private Boolean isMove = true;
+    [SerializeField] private GameObject hurtbox;
     // Start is called before the first frame update
     void Start()
     {
@@ -37,5 +38,24 @@ public class Turtle_0 : MonoBehaviour
 
     public void isMoving(Boolean canMove){
         isMove = canMove;
+    }
+
+    public override void Reset(){
+        isMoving(true);
+        hurtbox.GetComponent<KillEnemy>().Reset();
+    }
+
+    public override void kill(){
+        isMoving(false);
+        hurtbox.GetComponent<KillEnemy>().kill();
+        
+    }
+
+    public override void Disable(){
+        GameObject manager = GameObject.Find("GameManager");
+        manager.GetComponent<GameManager>().PopulateDisabledObjects("enemy", gameObject);
+        //hurtbox.GetComponent<KillEnemy>().Disable();
+        isMoving(false);
+        gameObject.transform.parent.gameObject.SetActive(false);
     }
 }
