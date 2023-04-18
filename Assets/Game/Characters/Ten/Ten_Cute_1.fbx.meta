@@ -90,6 +90,15 @@ ModelImporter:
   - first:
       74: -5293238852051711514
     second: Ten_Idle_1
+  - first:
+      74: -3882256881717649404
+    second: Ten_Jump_0_R
+  - first:
+      74: -8885317303994593813
+    second: Ten_Falling_R
+  - first:
+      74: -1437223564310770781
+    second: Armature|0Tpose
   externalObjects: {}
   materials:
     materialImportMode: 0
@@ -106,7 +115,8 @@ ModelImporter:
     rigImportErrors: 
     rigImportWarnings: 
     animationImportErrors: 
-    animationImportWarnings: 
+    animationImportWarnings: Event DoRespawn has a time (1.187355) outside the clip's
+      valid range (0.000000..0.041667). It will never be fired
     animationRetargetingWarnings: 
     animationDoRetargetingWarnings: 0
     importAnimatedCustomProperties: 1
@@ -120,8 +130,8 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: Ten_Death_0
-      takeName: Armature|Death_0
+      name: Armature|0Tpose
+      takeName: Armature|0Tpose
       internalID: 0
       firstFrame: 0
       lastFrame: 29
@@ -144,7 +154,7 @@ ModelImporter:
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves: []
       events:
-      - time: 1
+      - time: 0.6145833
         functionName: DoRespawn
         data: 
         objectReferenceParameter: {instanceID: 0}
@@ -389,6 +399,64 @@ ModelImporter:
         floatParameter: 0
         intParameter: 0
         messageOptions: 0
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Ten_Jump_0_R
+      takeName: Armature|Jump_0_R
+      internalID: 0
+      firstFrame: 0
+      lastFrame: 29
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Ten_Falling_R
+      takeName: Armature|Falling_R
+      internalID: 0
+      firstFrame: 0
+      lastFrame: 39
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
       transformMask: []
       maskType: 3
       maskSource: {instanceID: 0}

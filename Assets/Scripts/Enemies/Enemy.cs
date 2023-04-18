@@ -4,7 +4,7 @@ using UnityEngine;
 
 public abstract class Enemy : MonoBehaviour
 {
+    [SerializeField] private GameObject enemyPrefab;
+
     public abstract void kill();
-    public abstract void Reset();
-    public abstract void Disable();
 }

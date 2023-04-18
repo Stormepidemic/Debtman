@@ -18,6 +18,9 @@ public class Scrap : MonoBehaviour
     [SerializeField] private GameObject trail;
     [SerializeField] private AudioSource sound;
     [SerializeField] private GameObject shadow;
+
+    private Boolean spawned; //If this scrap was spawned by another object or was present at the beginning
+
     private bool objectDestroyed; //This is used so the gameObject isn't destroyed before the audio clip can finish
     // Start is called before the first frame update
     void Start()
@@ -45,6 +48,7 @@ public class Scrap : MonoBehaviour
             Vector3 adjustedPlayerPosition = new Vector3(player.transform.position.x, player.transform.position.y + offset, player.transform.position.z);
             if(collected && !manager.GetComponent<GameManager>().GetPaused()){
                 model.GetComponent<Renderer>().material = collectedMaterial;
+                trail.SetActive(true);
                 gameObject.transform.position = Vector3.MoveTowards(transform.position, adjustedPlayerPosition, speed);
                 if(Vector3.Distance(gameObject.transform.position, adjustedPlayerPosition) < 0.1f){
                     //Destroy(shadow); //destroys the shadow
@@ -68,5 +72,21 @@ public class Scrap : MonoBehaviour
         collected = true;
         Destroy(GetComponent<BoxCollider>()); //removes the collider from the object
         trail.SetActive(true);
+    }
+
+    public void SetSpawned(Boolean spawned){
+        this.spawned = spawned;
+    }
+
+    public void SetCollected(Boolean collected){
+        this.collected = collected;
+    }
+
+    public Boolean GetSpawned(){
+        return this.spawned;
+    }
+
+    public Boolean GetCollected(){
+        return this.collected;
     }
 }

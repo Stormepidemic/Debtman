@@ -61,5 +61,9 @@ public class Candle_Untimed : Interactible
         }
 
     }
+
+    public override Boolean GetActive(){
+        return activated;
+    }
     
 }

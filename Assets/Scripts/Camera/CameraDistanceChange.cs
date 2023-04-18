@@ -16,7 +16,9 @@ public class CameraDistanceChange : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        cam = GameObject.FindGameObjectsWithTag("MainCamera")[0];
+        if(cam == null){
+            cam = GameObject.FindGameObjectsWithTag("MainCamera")[0];
+        }
     }
 
     void OnTriggerStay(Collider other){

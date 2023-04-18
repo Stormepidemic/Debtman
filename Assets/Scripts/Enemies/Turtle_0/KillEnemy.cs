@@ -13,9 +13,11 @@ public class KillEnemy : MonoBehaviour
     private Transform contactPosition; //The position at which the enemy was killed
     private GameObject parentObject;
     private Rigidbody parentBody;
-    [SerializeField] private float flySpeed = 0.1f;
+
     [SerializeField] private AudioSource sound;
-    private Vector3 flyDirection;
+    [SerializeField] private float bounceForce;
+
+    [SerializeField] ParticleSystem[] particleEffects;
 
     void Start(){
         parentObject = transform.parent.parent.gameObject;
@@ -28,8 +30,10 @@ public class KillEnemy : MonoBehaviour
     void OnTriggerEnter(Collider other){ 
         
         if(other.gameObject.tag == "Player"){
+
             if(!other.gameObject.GetComponent<PlayerMovement>().enemyImmunity){
                 kill();
+                other.gameObject.GetComponent<PlayerMovement>().BouncePlayer(bounceForce);
             }else if(other.gameObject.GetComponent<PlayerMovement>().enemyImmunity){
                 kill();
             }
@@ -45,15 +49,17 @@ public class KillEnemy : MonoBehaviour
         anim.SetBool("kill",true); 
         sound.Play();
         hurtbox.SetActive(false); //Destroy the hurtbox for the enemy
+        playEffects();
+        
     }
 
-    public void Reset(){
-        anim.SetBool("kill", false);
-        //enemy.GetComponent<Enemy>().Reset();
-        hurtbox.SetActive(true);
-    }
-
-    public void Disable(){
-        enemy.SetActive(false);
+    private void playEffects(){
+        if(particleEffects != null){
+            if(particleEffects.Length > 0){
+                foreach(ParticleSystem effect in particleEffects){
+                    effect.Play();
+                }
+            }
+        }
     }
 }

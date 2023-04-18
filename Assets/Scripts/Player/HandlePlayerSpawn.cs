@@ -8,7 +8,7 @@ public class HandlePlayerSpawn : MonoBehaviour
 
     private void DoLandingEffect(){
         print("help");
-        Instantiate(landingCrackPreFab);
+        Instantiate(landingCrackPreFab, gameObject.transform.parent.gameObject.transform.position, Quaternion.identity);
     }
 
     private void SetCanMove(){

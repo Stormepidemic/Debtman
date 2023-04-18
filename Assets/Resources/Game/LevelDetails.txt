@@ -1,0 +1,5 @@
+LEVEL_NAME/LEVEL_NUMBER/LEVEL_TYPE/FOG_STATUS
+String/Int/String/Boolean
+
+Demo_0/0/tracking/true
+Demo_1/1/trail/false

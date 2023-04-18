@@ -27,6 +27,11 @@ public class CameraMove : MonoBehaviour
     [SerializeField] private float defaultHeight;
     [SerializeField] private float lookSpeed;
     private float height;
+
+    //Values associated with locking the camera to a spesific point
+    private Boolean locked;
+    private GameObject lockPoint;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -71,32 +76,40 @@ public class CameraMove : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        target = GameObject.Find("MainCamera_Target_0");
-        lookTarget = GameObject.Find("MainCamera_LookTarget_0");
-        player = GameObject.FindGameObjectsWithTag("Player")[0];
-        Transform cam = transform;
-        float movement = 0;
-        Vector3 desiredPos = cam.transform.position;
-        //The x,y and z components of the move camera vector
-        if(x){ //If x is UNLOCKED
-            movement += Math.Abs(target.transform.position.x - cam.position.x);
-            lastX = target.transform.position.x;
-        }
-        if(y){ //if y is UNLOCKED
-            movement += Math.Abs(target.transform.position.y - cam.position.y);
-            lastY = target.transform.position.y - cam.position.y;
-        }
-        if(z){ //if z is UNLOCKED
-            movement += Math.Abs(target.transform.position.z - cam.position.z);
-            lastZ = target.transform.position.z;
-        }
+        if(!locked){
+            target = GameObject.Find("MainCamera_Target_0");
+            lookTarget = GameObject.Find("MainCamera_LookTarget_0");
+            if(player == null){
+                player = GameObject.FindGameObjectsWithTag("Player")[0];
+            }
+            
+            Transform cam = transform;
+            float movement = 0;
+            Vector3 desiredPos = cam.transform.position;
+            //The x,y and z components of the move camera vector
+            if(x){ //If x is UNLOCKED
+                movement += Math.Abs(target.transform.position.x - cam.position.x);
+                lastX = target.transform.position.x;
+            }
+            if(y){ //if y is UNLOCKED
+                movement += Math.Abs(target.transform.position.y - cam.position.y);
+                lastY = target.transform.position.y - cam.position.y;
+            }
+            if(z){ //if z is UNLOCKED
+                movement += Math.Abs(target.transform.position.z - cam.position.z);
+                lastZ = target.transform.position.z;
+            }
 
-        desiredPos = new Vector3(lastX, lastY+height, lastZ - distanceFromPlayer);
-        if(movement > 0.1f){
-        //desiredPos = new Vector3(target.transform.position.x, height, target.transform.position.z - distanceFromPlayer);
-        //cam.position = Vector3.MoveTowards(cam.position, desiredPos, speed);
-        gameObject.transform.position = Vector3.SmoothDamp(gameObject.transform.position, desiredPos, ref velocity, smoothSpeed);
+            desiredPos = new Vector3(lastX, lastY+height, lastZ - distanceFromPlayer);
+            if(movement > 0.1f){
+                //desiredPos = new Vector3(target.transform.position.x, height, target.transform.position.z - distanceFromPlayer);
+                //cam.position = Vector3.MoveTowards(cam.position, desiredPos, speed);
+                gameObject.transform.position = Vector3.SmoothDamp(gameObject.transform.position, desiredPos, ref velocity, smoothSpeed);
+            }
+        }else{ //IS LOCKED
+            gameObject.transform.position = Vector3.SmoothDamp(gameObject.transform.position, lockPoint.transform.position, ref velocity, smoothSpeed);
         }
+        
         setRotation(); //Rotate to point at the player
         
 
@@ -124,4 +137,14 @@ public class CameraMove : MonoBehaviour
         Quaternion lookRotation = Quaternion.LookRotation((direction).normalized);
         transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * lookSpeed);
     }
+
+    public void Lock(GameObject lockPoint){
+        locked = true;
+        this.lockPoint = lockPoint;
+    }
+
+    public void Unlock(){
+        locked = false;
+    }
+
 }

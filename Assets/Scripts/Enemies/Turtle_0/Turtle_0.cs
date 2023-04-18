@@ -11,6 +11,7 @@ public class Turtle_0 : Enemy
     private Animator anim;
     public GameObject Turtle;
     private Boolean isMove = true;
+    private Boolean isAlive = true;
     [SerializeField] private GameObject hurtbox;
     // Start is called before the first frame update
     void Start()
@@ -40,22 +41,12 @@ public class Turtle_0 : Enemy
         isMove = canMove;
     }
 
-    public override void Reset(){
-        isMoving(true);
-        hurtbox.GetComponent<KillEnemy>().Reset();
-    }
-
     public override void kill(){
-        isMoving(false);
-        hurtbox.GetComponent<KillEnemy>().kill();
+        if(isAlive){
+            isMoving(false);
+            isAlive = false;
+            hurtbox.GetComponent<KillEnemy>().kill();
+        }
         
-    }
-
-    public override void Disable(){
-        GameObject manager = GameObject.Find("GameManager");
-        manager.GetComponent<GameManager>().PopulateDisabledObjects("enemy", gameObject);
-        //hurtbox.GetComponent<KillEnemy>().Disable();
-        isMoving(false);
-        gameObject.transform.parent.gameObject.SetActive(false);
     }
 }

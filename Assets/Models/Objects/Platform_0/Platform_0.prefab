@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 8383878863771127234}
   - component: {fileID: 6034104565042460936}
   - component: {fileID: 4935073830370945693}
+  - component: {fileID: 1907361740468669802}
   m_Layer: 0
   m_Name: Platform_0
   m_TagString: Ground
@@ -97,3 +98,21 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.048670016, y: 0.047496077, z: 0.11300778}
   m_Center: {x: 0.00056546635, y: -0.00013911996, z: 0.019942453}
+--- !u!114 &1907361740468669802
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5241502024004311261}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ab01889984f36f4eb5d32d526436404, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  textures:
+  - {fileID: 2100000, guid: a2928c598a99c8f4ba505c78d24b8721, type: 2}
+  - {fileID: 2100000, guid: 21b23a39a95675943a6e6cc47368bd42, type: 2}
+  - {fileID: 2100000, guid: eaff4ea81925f8448a3d374f319d0dd3, type: 2}
+  - {fileID: 2100000, guid: e4befdbf5d6ba0c4da4b758152928b4c, type: 2}
+  - {fileID: 2100000, guid: 74b01da4927334a49805663fca4ca6e6, type: 2}

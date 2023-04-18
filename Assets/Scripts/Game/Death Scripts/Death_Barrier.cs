@@ -12,7 +12,7 @@ public class Death_Barrier : MonoBehaviour
     }
     
 
-    void OnTriggerExit(Collider other){
+    void OnTriggerEnter(Collider other){
         //Calls to the Game Manager to kill the player and send them back to spawn.
         if(other.gameObject.tag == "Player"){
             manager.HandlePlayerDeath();

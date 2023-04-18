@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DestroyDestructible : Destructible
+public class DestroyDestructible : Destructable
 {
     [SerializeField] private int scrapValue;
     [SerializeField] private GameObject model;
@@ -23,7 +23,7 @@ public class DestroyDestructible : Destructible
             //Break();
             gameObject.transform.parent.gameObject.GetComponent<Collider>().enabled = false; //Disables the hitbox
             gameObject.GetComponent<Collider>().enabled = false; //Disable destroy box
-            sound.pitch = UnityEngine.Random.Range(0.75f + sound.pitch, 1.0f + sound.pitch);
+            sound.pitch = UnityEngine.Random.Range(0.75f, 1.0f);
             particles.Play(); //Play the particle effects
             sound.Play();
             
@@ -36,22 +36,20 @@ public class DestroyDestructible : Destructible
         for(int i = 0; i < scrapValue; i++){
             float x = Random.Range(0-collectibleSpread,collectibleSpread);
             float z = Random.Range(0-collectibleSpread,collectibleSpread);
-            Instantiate(collectiblePrefab, new Vector3(transform.position.x + x,transform.position.y + yOffset,transform.position.z + z), Quaternion.identity);
+            GameObject scrap = Instantiate(collectiblePrefab, new Vector3(transform.position.x + x,transform.position.y + yOffset,transform.position.z + z), Quaternion.identity);
+            scrap.GetComponent<Scrap>().SetSpawned(true);
+            scrap.GetComponent<Scrap>().SetCollected(true);
         }
     }
 
     public override void Break(){
-        anim.SetBool("Broken", false);
-        GameObject.Find("GameManager").GetComponent<GameManager>().PopulateDisabledObjects("destructible", gameObject);
-        anim.Rebind();
-        anim.Update(0f);
+        
+        //GameObject.Find("GameManager").GetComponent<GameManager>().PopulateDisabledObjects("destructible", gameObject);
+        
+        Destroy(gameObject.transform.parent.gameObject);
     }
 
-    public override void Reset(){
-        anim.SetBool("Broken", false);
-        gameObject.transform.parent.gameObject.GetComponent<Collider>().enabled = true;
-        gameObject.GetComponent<Collider>().enabled = true; //reenable destroy box
-        particles.Stop(); //Play the particle effects
-        sound.Stop();
+    public override void Ignite(){
+        //NOTHING!
     }
 }

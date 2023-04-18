@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DestroyExplosive : Destructible
+public class DestroyExplosive : Destructable
 {
     [SerializeField] private GameObject model;
     private Animator anim;
@@ -40,10 +40,12 @@ public class DestroyExplosive : Destructible
         if(other != null){
             if((other.gameObject.tag == "PlayerDealDamageToEnemy")){
             //manager.HandlePlayerDeath(); //KILL the player!
-            explode();
+                explode();
             
             }else if(other.gameObject.tag == "Explosion"){
-            explode();
+                explode();
+            }else if(other.gameObject.tag == "Fire"){
+                prime();
             }
         }
         
@@ -65,8 +67,8 @@ public class DestroyExplosive : Destructible
         primedParticles0.Stop();
         primedParticles1.Stop();
         explodeParticles.Play(); //Play the particle effects
-        sound.Play();
-        //AudioSource.PlayClipAtPoint(sound.GetComponent<AudioSource>().clip, gameObject.transform.position, 100.0f);
+        //sound.Play();
+        AudioSource.PlayClipAtPoint(sound.GetComponent<AudioSource>().clip, gameObject.transform.position, 1.0f);
         // if(explosionLight != null){
         //     Destroy(explosionLight, 0.3f);
         //     if(explosionRadius != null){
@@ -81,27 +83,11 @@ public class DestroyExplosive : Destructible
     }
 
     public override void Break(){
-        anim.SetBool("Explode", false);
-        gameObject.GetComponent<Collider>().enabled = false; //reenable destroy box
-        primedParticles1.Stop();
-        primedParticles0.Stop();
-        explodeParticles.Stop();
-        explosionLight.SetActive(false);
-        explosionRadius.SetActive(false);
-        GameObject.Find("GameManager").GetComponent<GameManager>().PopulateDisabledObjects("explosive", gameObject);
-        anim.Rebind();
-        anim.Update(0f);
+        Destroy(gameObject);
     }
 
-    public override void Reset(){
-        anim.SetBool("Explode", false);
-        gameObject.GetComponent<Collider>().enabled = true;
-        gameObject.GetComponent<Collider>().enabled = true; //reenable destroy box
-        primedParticles1.Stop();
-        primedParticles0.Stop();
-        explodeParticles.Stop();
-        explosionLight.SetActive(false);
-        explosionRadius.SetActive(false);
+    public override void Ignite(){
+        
     }
 
     

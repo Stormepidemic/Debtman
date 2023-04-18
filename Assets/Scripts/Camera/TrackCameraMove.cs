@@ -17,6 +17,10 @@ public class TrackCameraMove : MonoBehaviour
     private Vector3 velocity = Vector3.zero;
     private int respawnNode = 0; //The Camera Node where the camera gets set to upon a respawn of the player
 
+
+    [SerializeField] private GameObject lookTarget; //The target that this camera will rotate to look towards
+    [SerializeField] private float lookSpeed;
+
     //When the character moves away from the camera, the camera should move towards the next node
     //When the character moves towards the camera, the camera should move towards the previous node
 
@@ -36,8 +40,9 @@ public class TrackCameraMove : MonoBehaviour
     void LateUpdate()
     {
         player = GameObject.FindGameObjectsWithTag("Player")[0];
-        float toPlayerDist = Vector3.Distance(gameObject.transform.position, player.transform.position);
-        
+        float toPlayerDist = Vector3.Distance(new Vector3(gameObject.transform.position.x, 0.0f, gameObject.transform.position.z), 
+                                                new Vector3(player.transform.position.x, 0.0f, player.transform.position.z));
+        //toPlayerDist = new Vector3(toPlayerDist.x, 0.0f, toPlayerDist.z);
         if((Math.Abs(toPlayerDist - distanceFromPlayer) < 0.1f)){
             //DO NOTHING
         }else if((toPlayerDist - distanceFromPlayer) < -0.5f){ //Player moving towards camera
@@ -56,25 +61,30 @@ public class TrackCameraMove : MonoBehaviour
             var step = speed * Time.deltaTime;
             var desiredPos = Vector3.MoveTowards(gameObject.transform.position, nodes.ElementAt(previousNode).transform.position, step);
             gameObject.transform.position = Vector3.SmoothDamp(gameObject.transform.position, desiredPos, ref velocity, smoothSpeed);
-            setRotation(nodes.ElementAt(previousNode), 0.5f); //point the camera down when moving backwards
+            //setRotation(nodes.ElementAt(previousNode), 0.5f); //point the camera down when moving backwards
             }
-        }else if((toPlayerDist - distanceFromPlayer) > 0.5f){ //Player moving away from camera
+        }else if((toPlayerDist - distanceFromPlayer) > 0.0f){ //Player moving away from camera
             print("FORWARD");
             if(targetNode < nodes.Count()-1){ //Ensures we don't target a node that doesn't exist...
         
                 if((Vector3.Distance(gameObject.transform.position, nodes.ElementAt(targetNode).transform.position) < 0.01f)){
                 previousNode = targetNode;
                 targetNode = targetNode + 1;
-                 
-            }
+                }
             var step = speed * Time.deltaTime;
             var desiredPos = Vector3.MoveTowards(gameObject.transform.position, nodes.ElementAt(targetNode).transform.position, step);
             gameObject.transform.position = Vector3.SmoothDamp(gameObject.transform.position, desiredPos, ref velocity, smoothSpeed);
-            setRotation(nodes.ElementAt(targetNode), 0f);
+            //setRotation(nodes.ElementAt(targetNode), 0f);
+            
             }
         }
         
     }
+
+    void Update(){
+        setRotation();
+    }
+
     void setRotation(GameObject node, float offSet){ //Set the camera rotation to match the Camera_Node's
         //Get the forward vector
         float stepRotation = 0.01f;
@@ -84,6 +94,15 @@ public class TrackCameraMove : MonoBehaviour
         Vector3 newRotation = Vector3.RotateTowards(gameObject.transform.forward, adjTarget, stepRotation, 0.0f);
         gameObject.transform.rotation = Quaternion.LookRotation(newRotation);
     }
+
+    void setRotation(){
+        lookTarget = GameObject.Find("MainCamera_LookTarget_0");
+        Vector3 targetPos = lookTarget.transform.position;
+        Vector3 direction = targetPos - transform.position;
+        Quaternion lookRotation = Quaternion.LookRotation((direction).normalized);
+        transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * lookSpeed);
+    }
+
 
     void setNode(int nodeNumber){
 

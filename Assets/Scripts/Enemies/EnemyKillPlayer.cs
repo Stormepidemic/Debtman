@@ -5,6 +5,7 @@ using UnityEngine;
 public class EnemyKillPlayer : MonoBehaviour
 {
     private GameManager manager;
+    [SerializeField] private Enemy enemy;
     // Start is called before the first frame update
     [SerializeField] private BoxCollider trigger;
     
@@ -22,6 +23,8 @@ public class EnemyKillPlayer : MonoBehaviour
             }
             }
             
+        }else{
+            enemy.kill();
         }
     }
 }

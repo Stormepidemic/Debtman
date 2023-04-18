@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+//using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -27,6 +28,7 @@ public class PlayerMovement : MonoBehaviour
     private Boolean isGrounded;
     [SerializeField] private GameObject manager;
     [SerializeField] private GameObject bodyParticles;
+    [SerializeField] private GameObject endLevelParticles;
     //[SerializeField] private GameObject landFromJumpParticles;
     [SerializeField] private GameObject spinParticles;
     [SerializeField] private float manualDrag;
@@ -35,6 +37,10 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 previousDirection;
     private Boolean alive = true; //If the player is alive or not...
     [SerializeField] private int waitFrameCounter; //This counter is used in order to determine when a Waiting animation should play
+    [SerializeField] private GameObject camera;
+
+    [SerializeField] private GameObject deadModel; //The model represeting the Dead player
+    [SerializeField] private GameObject characterObject;
 
     // Start is called before the first frame update
     void Awake()
@@ -42,17 +48,20 @@ public class PlayerMovement : MonoBehaviour
         StartingRotation = transform.rotation;
         animator.SetBool("Spawn",true);
         currentSpeed = speed; //Default speed
+        camera = GameObject.FindGameObjectsWithTag("MainCamera")[0];
     }
     
     void Update(){
+        camera = GameObject.FindGameObjectsWithTag("MainCamera")[0];
+
         manager = GameObject.Find("GameManager");
         if(Time.timeScale > 0){
             if(canMove){
-            animator.SetBool("Spawn",false);
-            HandleAnimator();
-            HandleJump();
-            HandleSpin();
-            HandleWaiting();
+                animator.SetBool("Spawn",false);
+                HandleAnimator();
+                HandleJump();
+                HandleSpin();
+                HandleWaiting();
             }
 
             //Spin Logic
@@ -66,15 +75,17 @@ public class PlayerMovement : MonoBehaviour
 
     void FixedUpdate(){
         PlayerMovementInput = new Vector3(Input.GetAxis("Horizontal"), 0.0f, Input.GetAxis("Vertical"));
-        if(Mathf.Abs(PlayerMovementInput.x) > 0.0f && Mathf.Abs(PlayerMovementInput.z) > 0.0f){ //Prevents diagonal movement from being drastically faster
+        PlayerMovementInput = Quaternion.AngleAxis(camera.transform.rotation.y*100, Vector3.up) * PlayerMovementInput;
+        
+        if(Mathf.Abs(PlayerMovementInput.x) > 0.1f && Mathf.Abs(PlayerMovementInput.z) > 0.1f){ //Prevents diagonal movement from being drastically faster
             PlayerMovementInput = PlayerMovementInput.normalized;
         }
         //PlayerMovementInput = new Vector3(Input.GetAxis("Horizontal"), 0.0f, Input.GetAxis("Vertical"));
         if(Time.timeScale > 0){ //Only run if the game is not paused
             //Movement Logic
             if(canMove){
-            animator.SetBool("Spawn",false);
-            MovePlayer();
+                animator.SetBool("Spawn",false);
+                MovePlayer();
             }
         }
     }
@@ -121,6 +132,7 @@ public class PlayerMovement : MonoBehaviour
         }
         Vector3 MoveVector = PlayerMovementInput * currentSpeed;
         
+        
         if(PlayerMovementInput == Vector3.zero){
             PlayerBody.velocity = Vector3.Lerp(PlayerBody.velocity, new Vector3(0.0f, PlayerBody.velocity.y, 0.0f), Time.deltaTime*manualDrag);
         }else{
@@ -157,18 +169,20 @@ public class PlayerMovement : MonoBehaviour
             animator.SetBool("Running", false);
         }
         if(PlayerBody.velocity.y > 1.0f){ //RISING
-            if(isGrounded){
+            if(DetectGround()){
                 animator.SetBool("Running", true);
             }else{
+                animator.SetBool("Running", false);
                 animator.SetBool("Rising",true);
             }
         }else{
             animator.SetBool("Rising", false);
         }
         if(PlayerBody.velocity.y < -1.0f){ //FALLING
-            if(isGrounded){
+            if(DetectGround()){
                 animator.SetBool("Running", true);
             }else{
+                animator.SetBool("Running", false);
                 animator.SetBool("Falling", true);
             }
         }else{
@@ -181,10 +195,10 @@ public class PlayerMovement : MonoBehaviour
         RaycastHit hit;
         Vector3 adjPosition = new Vector3(transform.position.x - 0.1f, transform.position.y + 0.1f, transform.position.z);
         Physics.Raycast(adjPosition, -Vector3.up, out hit, Mathf.Infinity);
-        if(Input.GetKeyDown(KeyCode.Space)){ //Jump
+        if(Input.GetButtonDown("Jump")){ //Jump
             if((hit.collider != null) && (hit.collider.tag == "Ground")){
                 float distanceFromGround = Math.Abs(hit.point.y - transform.position.y);
-                if(distanceFromGround < 0.12f){
+                if(distanceFromGround < 0.15f){
 
                     isGrounded = true;
                     PlayerBody.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
@@ -200,7 +214,7 @@ public class PlayerMovement : MonoBehaviour
 
     //Handles the player using the spin move
     public void HandleSpin(){
-        if(Input.GetKeyDown(KeyCode.LeftShift) && ((spinValue-30) > 0)){
+        if(Input.GetButtonDown("Spin") && ((spinValue-30) > 0)){
             spinValue = spinValue - 60;
             lastSpinFrame = playerFrameCounter;
             mainModel.SetActive(false);
@@ -221,9 +235,13 @@ public class PlayerMovement : MonoBehaviour
     }
 
     public void HandleDeath(){
-        animator.SetBool("Death",true);
+        //animator.SetBool("Death",true);
         PlayerBody.useGravity = false;
+        PlayerBody.velocity = Vector3.zero;
         collider.enabled = false;
+        characterObject.SetActive(false);
+        mainModel.SetActive(false);
+        deadModel.SetActive(true);
 
     }
     public void HandleRespawn(){
@@ -254,4 +272,37 @@ public class PlayerMovement : MonoBehaviour
             waitFrameCounter = 0; //Reset the timer
         }
     }
+
+    public void SetCanMove(Boolean cm){
+        this.canMove = cm;
+    }
+
+    public void HandleExitLevel(){
+        Destroy(PlayerBody); //Destroy the physics handler
+        Destroy(mainModel); //Destroy the visual model
+        endLevelParticles.GetComponent<ParticleSystem>().Play();
+    }
+
+    private Boolean DetectGround(){
+        Boolean returnVal = false;
+        RaycastHit hit;
+        Vector3 adjPosition = new Vector3(transform.position.x - 0.1f, transform.position.y + 0.1f, transform.position.z);
+        Physics.Raycast(adjPosition, -Vector3.up, out hit, Mathf.Infinity);
+        
+        if((hit.collider != null) && (hit.collider.tag == "Ground")){
+            float distanceFromGround = Math.Abs(hit.point.y - transform.position.y);
+            if(distanceFromGround < 0.15f){
+                //print("HERE! " + hit.collider.tag);
+                isGrounded = true;
+                returnVal = true;
+            }
+            }
+        return returnVal;
+        }
+
+        public void BouncePlayer(float force){
+            PlayerBody.velocity = Vector3.zero;
+            PlayerBody.AddForce(Vector3.up * jumpForce*force, ForceMode.Impulse);
+        }
+        
 }

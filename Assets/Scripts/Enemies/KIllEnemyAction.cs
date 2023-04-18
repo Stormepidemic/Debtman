@@ -8,6 +8,7 @@ public class KIllEnemyAction : MonoBehaviour
 
     void Kill(){
         //hurtbox.GetComponent<Enemy>().Disable();
-        gameObject.GetComponent<Enemy>().Disable();
+        //gameObject.GetComponent<Enemy>().Disable();
+        Destroy(gameObject.transform.parent.gameObject);
     }
 }

@@ -1,0 +1,121 @@
+{
+    "name": "Input",
+    "maps": [
+        {
+            "name": "Player",
+            "id": "2c5a0f88-4644-42a0-adf9-06c3e3b5e5e9",
+            "actions": [
+                {
+                    "name": "Jump",
+                    "type": "Button",
+                    "id": "cf037feb-2124-4e2c-8ae9-2e870b1dc6ed",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Movement",
+                    "type": "PassThrough",
+                    "id": "b8bea38c-635b-4391-8f34-a15bf47f5519",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "7f0c67b8-6f91-46c3-83c3-16cc32890314",
+                    "path": "<XInputController>/buttonSouth",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Xbox",
+                    "action": "Jump",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "ed1aa95b-37b0-43e2-a812-838042cba711",
+                    "path": "",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Xbox",
+                    "action": "Movement",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "2D Vector",
+                    "id": "010d450a-fb6c-46a7-a404-bda5ef2fec40",
+                    "path": "2DVector",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Movement",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "up",
+                    "id": "4ad5e1c2-45e6-4048-aeab-ed66a780662a",
+                    "path": "<XInputController>/dpad/up",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Xbox",
+                    "action": "Movement",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "down",
+                    "id": "4744e6eb-9e0c-4a0e-8473-3aaa1acca18b",
+                    "path": "<XInputController>/dpad/down",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Xbox",
+                    "action": "Movement",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "left",
+                    "id": "b3809969-fe3c-4ced-844e-1375e768df2b",
+                    "path": "<XInputController>/dpad/left",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Xbox",
+                    "action": "Movement",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "right",
+                    "id": "4e8e5394-472f-4834-8269-03ba78982a7c",
+                    "path": "<XInputController>/dpad/right",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Xbox",
+                    "action": "Movement",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                }
+            ]
+        }
+    ],
+    "controlSchemes": [
+        {
+            "name": "Xbox",
+            "bindingGroup": "Xbox",
+            "devices": [
+                {
+                    "devicePath": "<XInputController>",
+                    "isOptional": true,
+                    "isOR": false
+                }
+            ]
+        }
+    ]
+}
