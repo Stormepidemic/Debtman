@@ -8,6 +8,7 @@ public class Scrap : MonoBehaviour
     private GameObject player;
     [SerializeField] private float speed;
     [SerializeField] private float offset;
+    [SerializeField] private int value; //The amount of 'scrap' this Scrap is worth
     private Boolean collected = false;
     [SerializeField] private GameObject manager;
     private Material material;
@@ -52,7 +53,7 @@ public class Scrap : MonoBehaviour
                 gameObject.transform.position = Vector3.MoveTowards(transform.position, adjustedPlayerPosition, speed);
                 if(Vector3.Distance(gameObject.transform.position, adjustedPlayerPosition) < 0.1f){
                     //Destroy(shadow); //destroys the shadow
-                    manager.GetComponent<GameManager>().IncrementScore(1); //Increments the score by 1
+                    manager.GetComponent<GameManager>().IncrementScore(value); //Increments the score by the value of this scrap
                     Destroy(trail);
                     Destroy(model);
                     Destroy(shadow);

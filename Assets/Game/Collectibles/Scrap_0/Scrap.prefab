@@ -83,8 +83,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 607e3388677418a478b94c6957eef424, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 0.1
+  speed: 0.2
   offset: 0
+  value: 10
   manager: {fileID: 0}
   collectedMaterial: {fileID: 2100000, guid: 364a58ab795b50042b44ed6179b4bd19, type: 2}
   model: {fileID: 1100673071285113682}
