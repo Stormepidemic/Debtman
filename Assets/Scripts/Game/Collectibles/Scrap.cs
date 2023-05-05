@@ -42,7 +42,10 @@ public class Scrap : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        player = GameObject.FindGameObjectsWithTag("Target")[0];
+        
+        if(player == null){
+            player = GameObject.FindGameObjectsWithTag("Target")[0];
+        }
         //print(player);
         if(!objectDestroyed){
             player = GameObject.FindGameObjectsWithTag("Target")[0];

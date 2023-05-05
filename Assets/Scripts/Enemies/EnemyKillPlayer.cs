@@ -14,7 +14,7 @@ public class EnemyKillPlayer : MonoBehaviour
     }
 
     void OnTriggerEnter(Collider other){
-        if(other.gameObject.tag != "PlayerDealDamageToEnemy"){
+        if(other.gameObject.tag != "PlayerDealDamageToEnemy" && other.gameObject.tag != "Explosion"){
             //Calls to the Game Manager to kill the player and send them back to spawn.
             if(other.gameObject.tag == "Player"){
                 if(!other.gameObject.GetComponent<PlayerMovement>().enemyImmunity){

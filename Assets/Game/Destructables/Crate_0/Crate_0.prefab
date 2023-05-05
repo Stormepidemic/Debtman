@@ -14971,12 +14971,13 @@ MonoBehaviour:
   scrapValue: 6
   model: {fileID: 3883771333147572617}
   destroyTime: 0.3
-  collectiblePrefab: {fileID: 238456414471498112, guid: bcf7d1d4ac98179449e47858e3137562,
+  collectiblePrefab: {fileID: 3926197020148642652, guid: e4b746ad0b959a74a970f135b9b6f83c,
     type: 3}
   yOffset: 0.5
   collectibleSpread: 1
   sound: {fileID: 2874224288754545065}
   particles: {fileID: 6189530222223279115}
+  hitboxDelay: 0.1
 --- !u!1001 &4117561793479836888
 PrefabInstance:
   m_ObjectHideFlags: 0

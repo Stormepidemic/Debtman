@@ -11,12 +11,17 @@ public class LevelData : MonoBehaviour
     [SerializeField] private String levelType; //VALID TYPES: Trail, Tracking
     [SerializeField] private Boolean fog; //Does this level have fog or not
 
-    private List<GameObject> items; 
-
+    private List<GameObject> items; //The items that are collected, Gems, the Contract, etc
+    [SerializeField] private Checkpoint[] checkpoints; //The checkpoints in the level
+    //[SerializeField] private int EntryIndex; //The index at which we want the player to spawn at (checkpoint)
+    private Checkpoint activeCheckpoint; //Whichever checkpoint the player last touched. If null, the default spawnpoint for the level should be used.
     private Boolean contractCollected;
+
+    private GameManager manager;
     // Start is called before the first frame update
     void Start()
     {
+        manager = GameObject.Find("GameManager").GetComponent<GameManager>();
         InitalizeLevelState();
         items = new List<GameObject>();
     }
@@ -59,8 +64,21 @@ public class LevelData : MonoBehaviour
 
     public void SetContractCollected(Boolean collected){
         this.contractCollected = collected;
-        print("COLLECTED!!");
+        //print("COLLECTED!!");
     }
 
+    public void SetActiveCheckPoint(Checkpoint check){
+        this.activeCheckpoint = check;
+    }
+    
+    //This function is essential to what happens when the player loads into this level. It defines the 'method' the player enters the level, wheather that be from the Hub or from a Bonus Round
+    //If the Player comes from the Bounus Round, special things need to happen such as spawning at a spesific checkpoint rather than the start of the level.
+    //CheckpointIndex -> The index of which checkpoint the player should spawn at. If 0, the player should spawn at the start of the level.
+    public void EnterLevel(int checkpointIndex){
+        if(checkpointIndex > 0){
+            activeCheckpoint = checkpoints[checkpointIndex];
+            manager.GetComponent<GameManager>().HandleCheckpoint(activeCheckpoint.GetPlayerCheckPointSpawn(), activeCheckpoint.GetCameraCheckPointSpawn());
+        }
+    }
 
 }

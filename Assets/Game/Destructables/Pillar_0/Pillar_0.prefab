@@ -110,12 +110,13 @@ MonoBehaviour:
   scrapValue: 20
   model: {fileID: 3655618195039962541}
   destroyTime: 0.3
-  collectiblePrefab: {fileID: 238456414471498112, guid: bcf7d1d4ac98179449e47858e3137562,
+  collectiblePrefab: {fileID: 3926197020148642652, guid: e4b746ad0b959a74a970f135b9b6f83c,
     type: 3}
   yOffset: 0.5
-  collectibleSpread: 1
+  collectibleSpread: 2
   sound: {fileID: 8250757323188868498}
   particles: {fileID: 37857424820559920}
+  hitboxDelay: 0.3
 --- !u!1 &6573318874029489960
 GameObject:
   m_ObjectHideFlags: 0

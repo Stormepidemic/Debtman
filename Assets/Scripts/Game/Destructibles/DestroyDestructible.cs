@@ -13,20 +13,32 @@ public class DestroyDestructible : Destructable
     [SerializeField] private float collectibleSpread;
     [SerializeField] private AudioSource sound;
     [SerializeField] private ParticleSystem particles;
-
+    [SerializeField] private float hitboxDelay; //How long after the destroy has begun shall the hitbox disppear?
+    private float hitboxTimer;
+    private bool broken;
     void Start(){
         anim = model.GetComponent<Animator>();
     }
+    void Update(){
+        if(broken){
+            if(hitboxTimer > hitboxDelay){
+                gameObject.transform.parent.gameObject.GetComponent<Collider>().enabled = false; //Disables the hitbox
+            }else{
+                hitboxTimer += Time.deltaTime;
+            }
+        }
+    }
+
     void OnTriggerEnter(Collider other){
         if(other.gameObject.tag =="PlayerDealDamageToEnemy" || other.gameObject.tag == "Explosion"){
             anim.SetBool("Broken", true);
             //Break();
-            gameObject.transform.parent.gameObject.GetComponent<Collider>().enabled = false; //Disables the hitbox
+            //gameObject.transform.parent.gameObject.GetComponent<Collider>().enabled = false; //Disables the hitbox
             gameObject.GetComponent<Collider>().enabled = false; //Disable destroy box
             sound.pitch = UnityEngine.Random.Range(0.75f, 1.0f);
             particles.Play(); //Play the particle effects
             sound.Play();
-            
+            broken = true;
             spawnCollectibles();
         }
         

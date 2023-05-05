@@ -19,6 +19,7 @@ public class GameManager : MonoBehaviour
     private static GameObject[] collected;
     [SerializeField] private GameObject playerPrefab;
     [SerializeField] private GameObject cameraPrefab;
+    private GameObject player;
     private const int MAX_SCRAP = 99; //The max amount of scrap that can be collected before earning a life
     private const int MAX_LIVES = 99; //The maximum amount of lives a player can have
     private GameObject[] deathBarriers;
@@ -32,10 +33,16 @@ public class GameManager : MonoBehaviour
     //LEVEL DATA
     private LevelData currentLevelData; //Data for the current level. Checkpoint coordinates, amount of collectibles, level information, etc
     private PersistentGameData gameData; //Data for the game itself. Which contracts have been collected, etc.
+    private bool enteringLevel = false;
 
     private Boolean playerAlive = true; //Is the player currently alive?
     private const float DEATH_DELAY = 2.0f; //How long to wait before respawning the player
     private float deathTimer = 0.0f; //The timer counting until the player respawns 
+
+    private Queue<int> scrapQueue;
+    private float counterDelay;
+    [SerializeField] AudioSource scrapCounterSound;
+    [SerializeField] AudioSource livesCounterSound;
 
     void Awake(){
         instance = this;
@@ -49,7 +56,9 @@ public class GameManager : MonoBehaviour
         if(gameData == null){
             gameData = GameObject.Find("PersistentGameData").GetComponent<PersistentGameData>();
             //gameData.LoadDefaultState(); //Load the inital state of the game before any saves get loaded.
-            print("HELLO");
+            //print("HELLO");
+
+            
         }
 
         //TESTING!!
@@ -63,15 +72,22 @@ public class GameManager : MonoBehaviour
         }
 
         deathBarriers = GameObject.FindGameObjectsWithTag("Death_Barrier");
+
+        scrapQueue = new Queue<int>(); //Init a queue so we can slowly add scrap
+        
     }
 
     // Update is called once per frame
     void Update()
     {
+
        HandlePause();
        if(currentLevelData == null){
+        //Logic needed for handling entering a level, calling to that Level's LevelData for info...
         currentLevelData = GameObject.Find("LevelData").GetComponent<LevelData>();
+        enteringLevel = true;
        }
+
         if(resettableElements == null){
             resettableElements = new List<ResettableElement>();
         }
@@ -97,19 +113,50 @@ public class GameManager : MonoBehaviour
             }
        }
 
+       //EnterLevel();
+
+       
+
+    }
+
+    void FixedUpdate(){
+        //Add one scrap or life per frame
+        if(counterDelay > 0.1f){
+            counterDelay = 0.0f;
+            
+            if(scrapQueue.Count > 0){
+                //score += scrapQueue.Peek();
+                int amount = scrapQueue.Dequeue();
+                int newScore = score + amount;
+                if(newScore > 99){
+                    score = 0;
+                    IncrementLives(1);
+                    score += amount - 1;
+                }else{
+                    score += amount;
+                    mainUI.GetComponent<MainUI>().ShowCounters(); //Show the amount of scrap & lives in the UI
+                }
+                scrapCounterSound.Play();
+            }
+        }
+        counterDelay += Time.deltaTime;
+        
+        
+
     }
 
     public void IncrementScore(int amount){
         int newScore = score + amount;
         if(newScore > 99){
-            score = 0;
-            IncrementLives(1);
-            score += amount-1;
+            // score = 0;
+            // IncrementLives(1);
+            // score += amount-1;
         }else{
-            score += amount;
+            //score += amount;
+            
             HandlePlayerDamageState();
         }
-
+        scrapQueue.Enqueue(amount); //Enqueue! 
         mainUI.GetComponent<MainUI>().ShowCounters(); //Show the amount of scrap & lives in the UI
 
         
@@ -128,7 +175,7 @@ public class GameManager : MonoBehaviour
         }else{
             lives += amount;
         }
-
+        livesCounterSound.Play();
         mainUI.GetComponent<MainUI>().ShowCounters(); //Show the amount of scrap & lives in the UI
     }
 
@@ -410,7 +457,7 @@ public class GameManager : MonoBehaviour
                 //element.DestroyElement();
             }
             
-            print(resettableElements.Count);
+            //print(resettableElements.Count);
         }
         foreach(ResettableElement destroyed in destroyedElements){
             resettableElements.Remove(destroyed);
@@ -431,6 +478,19 @@ public class GameManager : MonoBehaviour
             default:
             break;
         }
+    }
+
+    public void TeleportPlayer(GameObject tpPoint){
+        player.transform.position = tpPoint.transform.position;
+    }
+
+    public void EnterLevel(){
+        if(enteringLevel){
+            enteringLevel = false;
+            currentLevelData.EnterLevel(2);
+            //TeleportPlayer(playerSpawn);
+        }
+
     }
 
     

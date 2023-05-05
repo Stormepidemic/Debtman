@@ -8,6 +8,7 @@ public class Contract : MonoBehaviour
     [SerializeField] private Animator anim;
     private Boolean collected;
     [SerializeField] private ParticleSystem collectEffect;
+    [SerializeField] private AudioSource sound;
     // Start is called before the first frame update
     void Start()
     {
@@ -21,10 +22,11 @@ public class Contract : MonoBehaviour
     }
 
     void OnTriggerEnter(Collider other){
-        if(other.gameObject.tag == "Player"){
+        if((other.gameObject.tag == "Player") && !collected){
             anim.SetBool("Collected", true);
             collected = true;
             collectEffect.Play();
+            sound.Play();
             //Logic to handle adding the contract to the inventory, add that shit here
             GameObject.Find("GameManager").GetComponent<GameManager>().CollectInventoryCollectable("contract");
         }

@@ -35,5 +35,13 @@ public class Checkpoint : MonoBehaviour
     private void setRespawnPoint(){
         gameManager.GetComponent<GameManager>().HandleCheckpoint(playerSpawn, cameraSpawn);
     }
+
+    public GameObject GetPlayerCheckPointSpawn(){
+        return playerSpawn;
+    }
+
+    public GameObject GetCameraCheckPointSpawn(){
+        return cameraSpawn;
+    }
     
 }
