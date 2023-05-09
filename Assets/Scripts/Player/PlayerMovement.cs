@@ -41,6 +41,7 @@ public class PlayerMovement : MonoBehaviour
 
     [SerializeField] private GameObject deadModel; //The model represeting the Dead player
     [SerializeField] private GameObject characterObject;
+    public float cameraProjectedMovementOffset;
 
     // Start is called before the first frame update
     void Awake()
@@ -49,12 +50,16 @@ public class PlayerMovement : MonoBehaviour
         animator.SetBool("Spawn",true);
         currentSpeed = speed; //Default speed
         camera = GameObject.FindGameObjectsWithTag("MainCamera")[0];
+        
     }
+
+   
     
     void Update(){
         camera = GameObject.FindGameObjectsWithTag("MainCamera")[0];
 
         manager = GameObject.Find("GameManager");
+        this.ApplyLevelSettings();
         if(Time.timeScale > 0){
             if(canMove){
                 animator.SetBool("Spawn",false);
@@ -75,7 +80,7 @@ public class PlayerMovement : MonoBehaviour
 
     void FixedUpdate(){
         PlayerMovementInput = new Vector3(Input.GetAxis("Horizontal"), 0.0f, Input.GetAxis("Vertical"));
-        PlayerMovementInput = Quaternion.AngleAxis(camera.transform.rotation.y*100, Vector3.up) * PlayerMovementInput;
+        PlayerMovementInput = Quaternion.AngleAxis(camera.transform.rotation.y*cameraProjectedMovementOffset, Vector3.up) * PlayerMovementInput;
         
         if(Mathf.Abs(PlayerMovementInput.x) > 0.1f && Mathf.Abs(PlayerMovementInput.z) > 0.1f){ //Prevents diagonal movement from being drastically faster
             PlayerMovementInput = PlayerMovementInput.normalized;
@@ -214,12 +219,14 @@ public class PlayerMovement : MonoBehaviour
 
     //Handles the player using the spin move
     public void HandleSpin(){
-        if(Input.GetButtonDown("Spin") && ((spinValue-30) > 0)){
+        if(Input.GetButtonDown("Spin") && ((spinValue-1) > 0)){
             spinValue = spinValue - 60;
             lastSpinFrame = playerFrameCounter;
             mainModel.SetActive(false);
             spinModel.SetActive(true);
             spinParticles.GetComponent<ParticleSystem>().Play();
+            animator.SetBool("Swing", true);
+            //animator.SetBool("Swing", false);
             
             //Disables the main hitbox
             enemyImmunity = true;
@@ -303,6 +310,10 @@ public class PlayerMovement : MonoBehaviour
         public void BouncePlayer(float force){
             PlayerBody.velocity = Vector3.zero;
             PlayerBody.AddForce(Vector3.up * jumpForce*force, ForceMode.Impulse);
+        }
+
+        public void ApplyLevelSettings(){
+            manager.GetComponent<GameManager>().SetUpLevelSettings(this);
         }
         
 }

@@ -43,11 +43,9 @@ public class Scrap : MonoBehaviour
     void Update()
     {
         
-        if(player == null){
-            player = GameObject.FindGameObjectsWithTag("Target")[0];
-        }
+        
         //print(player);
-        if(!objectDestroyed){
+        if(!objectDestroyed && collected){
             player = GameObject.FindGameObjectsWithTag("Target")[0];
             Vector3 adjustedPlayerPosition = new Vector3(player.transform.position.x, player.transform.position.y + offset, player.transform.position.z);
             if(collected && !manager.GetComponent<GameManager>().GetPaused()){
@@ -70,6 +68,10 @@ public class Scrap : MonoBehaviour
     }
 
     void OnTriggerEnter(){
+        if(player == null){
+            player = GameObject.FindGameObjectsWithTag("Target")[0];
+        }
+
         sound.pitch = UnityEngine.Random.Range(0.75f, 1.0f);
         sound.Play();
 

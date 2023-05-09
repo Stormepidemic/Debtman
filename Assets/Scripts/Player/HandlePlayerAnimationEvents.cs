@@ -27,5 +27,10 @@ public class HandlePlayerAnimationEvents : MonoBehaviour
         anim.SetInteger("Waiting", 0);
     }
 
+    private void EndSwing(){
+        Animator anim = gameObject.GetComponent<Animator>();
+        anim.SetBool("Swing", false);
+    }
+
     
 }

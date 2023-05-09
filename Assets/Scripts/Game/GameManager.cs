@@ -210,7 +210,7 @@ public class GameManager : MonoBehaviour
     public void HandlePlayerDeath(){
         
         DecrementLives(1); //lives--;
-        score = 0; //Reset the score to 0
+        
         GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
         players[0].GetComponent<PlayerMovement>().canMove = false;
         players[0].GetComponent<PlayerMovement>().HandleDeath();
@@ -246,21 +246,27 @@ public class GameManager : MonoBehaviour
         //cams = GameObject.FindGameObjectsWithTag("MainCamera");
         //cams[0].GetComponent<CameraMove>().centerCamera(); //recenters the main camera
         switch(currentLevelData.GetLevelType()){
-            case("trail"):
-                GameObject.Find("CM vcam1").GetComponent<CinemachineVirtualCamera>().Follow = Instantiate(playerPrefab, playerRespawnPos, Quaternion.identity).transform;
+            case("Trailing"):
+                this.player = Instantiate(playerPrefab, playerRespawnPos, Quaternion.identity);
+                //this.player.GetComponent<PlayerMovement>().cameraProjectedMovementOffset = 101.0f;
+                GameObject.Find("CM vcam1").GetComponent<CinemachineVirtualCamera>().Follow = player.transform;
                 GameObject.Find("CM vcam1").GetComponent<CinemachineVirtualCamera>().m_LookAt = GameObject.Find("CM vcam1").GetComponent<CinemachineVirtualCamera>().Follow;
                 cams[0].transform.LookAt(GameObject.Find("CM vcam1").GetComponent<CinemachineVirtualCamera>().Follow);
+                
             break;
-            case("tracking"):
+            case("Tracking"):
                 Instantiate(playerPrefab, playerRespawnPos, Quaternion.identity);
             break;
-            case("chase"):
+            case("Chase"):
             break;
-            case("boss"):
+            case("Boss"):
             break;
-            case("hub"):
+            case("Hub"):
             break;
         }
+
+        score = 0; //Reset the score to 0
+        scrapQueue = new Queue<int>(); //Init a queue so we can slowly add scrap
         
         Reinstate();
         ResetResetableObjects(); //Turn back on/reset all objects not saved upon a checkpoint
@@ -488,9 +494,14 @@ public class GameManager : MonoBehaviour
         if(enteringLevel){
             enteringLevel = false;
             currentLevelData.EnterLevel(2);
+
             //TeleportPlayer(playerSpawn);
         }
 
+    }
+
+    public void SetUpLevelSettings(PlayerMovement player){
+        player.cameraProjectedMovementOffset = currentLevelData.GetCameraProjectionMultiple();
     }
 
     
