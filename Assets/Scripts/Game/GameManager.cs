@@ -121,7 +121,7 @@ public class GameManager : MonoBehaviour
 
     void FixedUpdate(){
         //Add one scrap or life per frame
-        if(counterDelay > 0.1f){
+        if(counterDelay > 0.05f){
             counterDelay = 0.0f;
             
             if(scrapQueue.Count > 0){

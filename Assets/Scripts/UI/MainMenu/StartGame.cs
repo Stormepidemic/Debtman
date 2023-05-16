@@ -8,8 +8,7 @@ public class StartGame : MonoBehaviour
 {
     
     public void clicked(){
-        SceneManager.LoadScene("Demo_0");
-        SceneManager.UnloadSceneAsync("Demo_0");
-        print("START");
+        SceneManager.LoadScene("Demo_2");
+        SceneManager.UnloadSceneAsync("Demo_2");
     }
 }

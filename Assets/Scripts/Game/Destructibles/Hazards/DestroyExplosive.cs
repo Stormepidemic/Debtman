@@ -25,7 +25,7 @@ public class DestroyExplosive : Destructable
 
 
     void OnCollisionEnter(Collision other){
-        if((other.gameObject.tag == "Player") || (other.gameObject.tag == "PlayerDealDamageToEnemy")){
+        if((other.gameObject.tag == "Player") || (other.gameObject.tag == "PlayerDealDamageToEnemy") || (other.gameObject.tag == "Fire")){
             //manager.HandlePlayerDeath(); //KILL the player!
             prime();
             
