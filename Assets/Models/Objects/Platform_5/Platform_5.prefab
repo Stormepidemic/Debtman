@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 8935747856034013829}
   - component: {fileID: 6622209125928228431}
   - component: {fileID: 4985682359949853315}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Platform_5
   m_TagString: Ground
   m_Icon: {fileID: 0}
@@ -26,13 +26,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4676474109832656794}
+  serializedVersion: 2
   m_LocalRotation: {x: -0.707107, y: -0.000000029802322, z: -0.00000009685755, w: 0.70710665}
   m_LocalPosition: {x: -5.0581384, y: 1.0591855, z: 3.4629183}
   m_LocalScale: {x: 39.696, y: 41.412, z: 52.617}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
 --- !u!33 &8935747856034013829
 MeshFilter:
@@ -92,9 +92,17 @@ MeshCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4676474109832656794}
   m_Material: {fileID: 13400000, guid: e702f2fea8d4eb143b0ccd6b010fb5c2, type: 2}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
   m_IsTrigger: 0
+  m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 4
+  serializedVersion: 5
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -6300603052576046403, guid: ad1cf467f9286e3479aee31519391607, type: 3}

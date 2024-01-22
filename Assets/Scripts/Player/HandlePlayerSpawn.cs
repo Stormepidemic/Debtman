@@ -7,7 +7,6 @@ public class HandlePlayerSpawn : MonoBehaviour
     [SerializeField] private GameObject landingCrackPreFab;
 
     private void DoLandingEffect(){
-        print("help");
         Instantiate(landingCrackPreFab, gameObject.transform.parent.gameObject.transform.position, Quaternion.identity);
     }
 

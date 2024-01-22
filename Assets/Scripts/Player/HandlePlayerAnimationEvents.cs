@@ -5,6 +5,8 @@ using UnityEngine;
 public class HandlePlayerAnimationEvents : MonoBehaviour
 {
     [SerializeField] private GameObject walkParticles;
+    [SerializeField] private Animator animator;
+    [SerializeField] private Animate_Blink faceScript;
 
     private void DoFootStep(){
         GameObject parent = gameObject.transform.parent.gameObject;
@@ -27,9 +29,12 @@ public class HandlePlayerAnimationEvents : MonoBehaviour
         anim.SetInteger("Waiting", 0);
     }
 
-    private void EndSwing(){
-        Animator anim = gameObject.GetComponent<Animator>();
-        anim.SetBool("Swing", false);
+    private void EndDoubleJumpAnimation(){
+        animator.SetBool("Double Jump", false);
+    }
+
+    private void ChangeFace(int faceNumber){
+        faceScript.SetFacialExpression(faceNumber);
     }
 
     

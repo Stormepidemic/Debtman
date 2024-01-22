@@ -4,11 +4,12 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class TriggerSceneSwap : MonoBehaviour
+public class TriggerSceneSwap : Volume
 {
     [SerializeField] private string sceneName;
     private GameObject music;
     [SerializeField] private AudioClip otherSceneMusic;
+    [SerializeField] private GameObject facePoint;
     // Start is called before the first frame update
     void Start()
     {
@@ -41,7 +42,12 @@ public class TriggerSceneSwap : MonoBehaviour
     void OnTriggerEnter(Collider other){
         if(other.gameObject.tag == "Player"){
             other.gameObject.GetComponent<PlayerMovement>().SetCanMove(false);
-            other.gameObject.GetComponent<PlayerMovement>().HandleExitLevel();
+            if(facePoint != null){
+                other.gameObject.GetComponent<PlayerMovement>().HandleExitLevel(facePoint);
+            }else{
+                other.gameObject.GetComponent<PlayerMovement>().HandleExitLevel();
+            }
+            
         }
         StartCoroutine(SceneChangeFade());
         

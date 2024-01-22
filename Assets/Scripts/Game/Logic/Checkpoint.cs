@@ -16,9 +16,9 @@ public class Checkpoint : MonoBehaviour
         gameManager = GameObject.Find("GameManager");
     }
     private void OnTriggerEnter(Collider other){
-        player = GameObject.FindGameObjectsWithTag("Player")[0];
+        //player = GameObject.FindGameObjectsWithTag("Player")[0];
         if(!activated){
-            if(other.tag == player.tag){
+            if(other.tag == "Player"){
             Destroy(gameObject.GetComponent<BoxCollider>());
             setRespawnPoint();
             //Activate/Deactivate the models

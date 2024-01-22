@@ -16,6 +16,9 @@ TagManager:
   - Collectable
   - Fire
   - Resettable
+  - HeadHit
+  - PlayerStomp
+  - GroundNoParent
   layers:
   - Default
   - TransparentFX
@@ -24,8 +27,8 @@ TagManager:
   - Water
   - UI
   - Player
-  - 
-  - 
+  - Ground
+  - GroundNoParent
   - 
   - 
   - 

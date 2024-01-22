@@ -12,7 +12,8 @@ public class Turtle_0 : Enemy
     public GameObject Turtle;
     private Boolean isMove = true;
     private Boolean isAlive = true;
-    [SerializeField] private GameObject hurtbox;
+    [SerializeField] ParticleSystem[] particleEffects;
+    //[SerializeField] private GameObject hurtbox;
     // Start is called before the first frame update
     void Start()
     {
@@ -41,12 +42,24 @@ public class Turtle_0 : Enemy
         isMove = canMove;
     }
 
-    public override void kill(){
+    public override void kill(string type){
         if(isAlive){
             isMoving(false);
             isAlive = false;
-            hurtbox.GetComponent<KillEnemy>().kill();
+            anim.SetBool("kill",true); 
+            //sound.Play();
+            //hurtbox.GetComponent<KillEnemy>().kill();
         }
         
+    }
+
+    private void playEffects(){
+        if(particleEffects != null){
+            if(particleEffects.Length > 0){
+                foreach(ParticleSystem effect in particleEffects){
+                    effect.Play();
+                }
+            }
+        }
     }
 }

@@ -78,11 +78,12 @@ public class DestroyExplosive : Destructable
         // Destroy(this.gameObject, sound.clip.length); 
     }
 
-    public override void spawnCollectibles(){
+    public override void spawnCollectibles(bool autoCollect){
         //Overriden to promote code reuse, this doesn't actually spawn anything...
     }
 
     public override void Break(){
+        GameObject.Find("GameManager").GetComponent<GameManager>().IncrementDestruction(destructionWeight);
         Destroy(gameObject);
     }
 

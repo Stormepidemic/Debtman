@@ -11,6 +11,8 @@ public class GameManager : MonoBehaviour
     public static GameManager instance;
     public static int score;
     public static int lives = 10;
+    public static float destructionPercentage = 0.0f;
+    private int currentDestructionCount; //The current amount of destruction in a level
 
     private GameObject mainUI; //The main UI in the game in a normal level
 
@@ -44,6 +46,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] AudioSource scrapCounterSound;
     [SerializeField] AudioSource livesCounterSound;
 
+
+
     void Awake(){
         instance = this;
         //I'll have to figure this one out later. Basically, reloading a current scene causes issues and makes multiple GameManagers. This is a problem.
@@ -57,8 +61,6 @@ public class GameManager : MonoBehaviour
             gameData = GameObject.Find("PersistentGameData").GetComponent<PersistentGameData>();
             //gameData.LoadDefaultState(); //Load the inital state of the game before any saves get loaded.
             //print("HELLO");
-
-            
         }
 
         //TESTING!!
@@ -71,9 +73,11 @@ public class GameManager : MonoBehaviour
             resetableObjects[i] = new List<GameObject>();
         }
 
+        currentLevelData = FindObjectOfType<LevelData>();
         deathBarriers = GameObject.FindGameObjectsWithTag("Death_Barrier");
 
         scrapQueue = new Queue<int>(); //Init a queue so we can slowly add scrap
+        currentDestructionCount = 0;
         
     }
 
@@ -110,11 +114,11 @@ public class GameManager : MonoBehaviour
                 playerAlive = true;
                 StartCoroutine(HandleDeathFade("in"));
                 Invoke("HandlePlayerRespawn", DEATH_DELAY); //Respawn the player
+                
             }
        }
-
        //EnterLevel();
-
+        CameraObserver();
        
 
     }
@@ -210,13 +214,15 @@ public class GameManager : MonoBehaviour
     public void HandlePlayerDeath(){
         
         DecrementLives(1); //lives--;
-        
+        ClearClearables(ClearableCondition.PLAYER_DEATH);
         GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
-        players[0].GetComponent<PlayerMovement>().canMove = false;
-        players[0].GetComponent<PlayerMovement>().HandleDeath();
-        playerAlive = false;
-        
-
+        for(int i = 0; i < players.Length; i++){ //Quick and dirty workaround for a slight change in how I organize the Player gameObject and it's children.
+            if(players[i].GetComponent<PlayerMovement>() != null){
+                players[i].GetComponent<PlayerMovement>().canMove = false;
+                players[i].GetComponent<PlayerMovement>().HandleDeath();
+                playerAlive = false;
+            }
+        }
     }
 
     // public void HandlePlayerDamage(){
@@ -235,33 +241,42 @@ public class GameManager : MonoBehaviour
         GameObject[] cams = GameObject.FindGameObjectsWithTag("MainCamera");
         DestroyAll(players);
         //DestroyAll(cams);
-        
+
         Vector3 playerRespawnPos = playerSpawn.transform.position;
         Vector3 camRespawnPos = cameraSpawn.transform.position;
         Transform camRotation = cameraSpawn.transform;
         //WAIT
         //Instantiate(playerPrefab, playerRespawnPos, Quaternion.identity);
         //Instantiate(cameraPrefab, camRotation, true);
-        players[0].GetComponent<PlayerMovement>().HandleRespawn();
+        for(int i = 0; i < players.Length; i++){
+            if(players[i].GetComponent<PlayerMovement>() != null){
+                players[i].GetComponent<PlayerMovement>().HandleRespawn();
+            }
+        }
+
         //cams = GameObject.FindGameObjectsWithTag("MainCamera");
         //cams[0].GetComponent<CameraMove>().centerCamera(); //recenters the main camera
-        switch(currentLevelData.GetLevelType()){
-            case("Trailing"):
+        string levelType = currentLevelData.GetLevelType().ToUpper(); //Making this ToUpper because I actually just spent 2 hours trying to figure out why this wasn't working only to see that I had 'tracking' instead of 'Tracking' ,,,
+        switch(levelType){
+            case("TRAILING"):
                 this.player = Instantiate(playerPrefab, playerRespawnPos, Quaternion.identity);
                 //this.player.GetComponent<PlayerMovement>().cameraProjectedMovementOffset = 101.0f;
-                GameObject.Find("CM vcam1").GetComponent<CinemachineVirtualCamera>().Follow = player.transform;
-                GameObject.Find("CM vcam1").GetComponent<CinemachineVirtualCamera>().m_LookAt = GameObject.Find("CM vcam1").GetComponent<CinemachineVirtualCamera>().Follow;
+                Debug.Log("Targets: " + GameObject.FindGameObjectsWithTag("Target").Length);
+                GameObject.Find("CM vcam1").GetComponent<CinemachineVirtualCamera>().Follow = GameObject.Find("MainCamera_LookTarget_0").transform;
+                GameObject.Find("CM vcam1").GetComponent<CinemachineVirtualCamera>().m_LookAt = GameObject.Find("vCamAim").transform;
+                GameObject.Find("vCamAim").GetComponent<CinemachineVirtualCamera>().Follow = GameObject.Find("MainCamera_LookTarget_0").transform;
                 cams[0].transform.LookAt(GameObject.Find("CM vcam1").GetComponent<CinemachineVirtualCamera>().Follow);
                 
             break;
-            case("Tracking"):
+            case("TRACKING"):
                 Instantiate(playerPrefab, playerRespawnPos, Quaternion.identity);
+                //cams[0].GetComponent<CameraBase>().SetCameraTarget()
             break;
-            case("Chase"):
+            case("CHASE"):
             break;
-            case("Boss"):
+            case("BOSS"):
             break;
-            case("Hub"):
+            case("HUB"):
             break;
         }
 
@@ -271,6 +286,8 @@ public class GameManager : MonoBehaviour
         Reinstate();
         ResetResetableObjects(); //Turn back on/reset all objects not saved upon a checkpoint
         StartCoroutine(HandleDeathFade("out"));
+
+        CameraObserver(); //Ensure our camera is correctly moved and is looking at the player
 
         //Show the sliding elements to the player upon respawn
         mainUI.GetComponent<MainUI>().ShowCounters();
@@ -392,10 +409,10 @@ public class GameManager : MonoBehaviour
 
             case "destructible":
                 resetableObjects[1].Add(obj);
-                obj.transform.parent.gameObject.SetActive(false);
+                //obj.transform.parent.gameObject.SetActive(false);
             break;
 
-            case "interactible":
+            case "interactable":
                 resetableObjects[2].Add(obj);
             break;
 
@@ -428,10 +445,10 @@ public class GameManager : MonoBehaviour
         //Reset spawned collectibles
         GameObject[] scrap = GameObject.FindGameObjectsWithTag("Collectable");
         foreach(GameObject spawnedItem in scrap){
-            if(spawnedItem.GetComponent<Scrap>() != null){ //If it is scrap...
-                if(spawnedItem.GetComponent<Scrap>().GetSpawned()){
+            if(spawnedItem.GetComponent<ScrapV2>() != null){ //If it is scrap...
+                if(spawnedItem.GetComponent<ScrapV2>().GetSpawned()){
                     Destroy(spawnedItem); //If the scrap was spawned by another object
-                }else if(spawnedItem.GetComponent<Scrap>().GetCollected()){
+                }else if(spawnedItem.GetComponent<ScrapV2>().GetCollected()){
                     Destroy(spawnedItem); //If the scrap was touched, but may not have been collected
                 }
             }
@@ -440,11 +457,12 @@ public class GameManager : MonoBehaviour
         
         foreach(GameObject item in resetableObjects[2]){ //INTERACTiBLE
             //Reset interactibles
-            item.GetComponent<Interactible>().Deactivate();
+            item.GetComponent<Interactable>().Deactivate();
         }
 
         foreach(ResettableElement element in resettableElements){
             element.ResetElement();
+            print(element.gameObject.name);
         }
     }
 
@@ -460,7 +478,7 @@ public class GameManager : MonoBehaviour
             if(!element.GetElementStatus()){
                 //resettableElements.Remove(element);
                 destroyedElements.Add(element);
-                //element.DestroyElement();
+                element.DestroyElement();
             }
             
             //print(resettableElements.Count);
@@ -468,10 +486,21 @@ public class GameManager : MonoBehaviour
         foreach(ResettableElement destroyed in destroyedElements){
             resettableElements.Remove(destroyed);
             destroyed.DestroyElement();
+            print(destroyed.gameObject.name);
             print(resettableElements.Count);
         }
         //resettableElements = new List<ResettableElement>(); //Pretty much just delete the reset points
 
+    }
+
+    /*
+    * Call to Clear any Clearable which is of the given ClearableCondition.
+    */
+    private void ClearClearables(ClearableCondition condition){
+        ClearableElement[] clearables = FindObjectsOfType<ClearableElement>();
+        foreach(ClearableElement elem in clearables){
+            elem.ClearElement(condition);
+        }
     }
 
     public void CollectInventoryCollectable(String type){ //Handle special collectables that go into the inventory rather than lives/scrap counter
@@ -500,11 +529,63 @@ public class GameManager : MonoBehaviour
 
     }
 
+    public void CameraObserver(){
+        
+        switch(currentLevelData.GetLevelType()){
+            case("Trailing"):
+                if(GameObject.Find("CM vcam1").GetComponent<CinemachineVirtualCamera>().Follow == null){
+                    GameObject[] cams = GameObject.FindGameObjectsWithTag("MainCamera");
+                    GameObject.Find("CM vcam1").GetComponent<CinemachineVirtualCamera>().Follow = GameObject.Find("MainCamera_LookTarget_0").transform;
+                    GameObject.Find("CM vcam1").GetComponent<CinemachineVirtualCamera>().m_LookAt = GameObject.Find("vCamAim").transform;
+                    GameObject.Find("vCamAim").GetComponent<CinemachineVirtualCamera>().Follow = GameObject.Find("MainCamera_LookTarget_0").transform;
+                    //cams[0].transform.LookAt(GameObject.Find("CM vcam1").GetComponent<CinemachineVirtualCamera>().Follow);
+                }
+            break;
+            case("Tracking"):
+
+            break;
+            case("Chase"):
+            break;
+            case("Boss"):
+            break;
+            case("Hub"):
+            break;
+        }
+    }
+
     public void SetUpLevelSettings(PlayerMovement player){
         player.cameraProjectedMovementOffset = currentLevelData.GetCameraProjectionMultiple();
     }
 
+    public float GetDestructionPercentage(){
+        return (currentDestructionCount+0.0f)/currentLevelData.GetDestructionTotal();
+    }
+
+    //Used when a Destruction object is killed (Enemy or Destructable)
+    public void IncrementDestruction(int value){
+        mainUI.GetComponent<MainUI>().ShowCounters(); //Show the amount of scrap & lives in the UI
+        currentDestructionCount += value;
+    }
     
+    //Used when a Destruction object needs to respawn
+    public void DecrementDestruction(int value){
+        mainUI.GetComponent<MainUI>().ShowCounters(); //Show the amount of scrap & lives in the UI
+        if((currentDestructionCount - value) < 0.0f){
+            currentDestructionCount = 0;
+        }else{
+            currentDestructionCount -= value;
+        }
+        //Debug.Log(currentDestructionCount);
+    }
+
+    public void SetMainCameraTarget(Transform target){
+        GameObject.FindGameObjectsWithTag("MainCamera")[0].GetComponent<CameraBase>().SetCameraTarget(target);
+    }
+    public void SetMainCameraLookTarget(Transform target){
+        GameObject.FindGameObjectsWithTag("MainCamera")[0].GetComponent<CameraBase>().SetCameraLookTarget(target);
+    }
+
+
 
     
 }

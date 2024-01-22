@@ -59,11 +59,18 @@ public class Animate_Blink : MonoBehaviour
  
             for(int i = 0 ; i < keyCodes.Length; i++){
                 if(Input.GetKeyDown(keyCodes[i])){
-                    baseTexture = faces[i];
-                    GetComponent<Renderer>().material.SetTexture("_MainTex", baseTexture); //Set the texture immediately
+                    SetFacialExpression(i);
                 }
             }
             
         }   
+    }
+
+    public void SetFacialExpression(int faceNumber){
+        if(baseTexture != faces[faceNumber]){
+            baseTexture = faces[faceNumber];
+            GetComponent<Renderer>().material.SetTexture("_MainTex", baseTexture); //Set the texture immediately
+        }
+        
     }
 }

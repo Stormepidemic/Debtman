@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine.Video;
 using System;
 using UnityEngine;
+using Cinemachine;
 
 public class MainMenuManager : MonoBehaviour
 {
@@ -10,6 +11,10 @@ public class MainMenuManager : MonoBehaviour
     [SerializeField] private GameObject[] videos; //The videos that are played when the game launches and serve as a buffer between start and the main menu
     private int currentVideoIndex = 0;
     [SerializeField] GameObject menu;
+
+    [SerializeField] CinemachineDollyCart dolly;
+    [SerializeField] FadeTexture cameraOverlay;
+
     void Start()
     {
         menu.SetActive(false);
@@ -32,6 +37,7 @@ public class MainMenuManager : MonoBehaviour
             }
         }else{
             menu.SetActive(true);
+            PostVideo();
         }
         
     }
@@ -42,5 +48,14 @@ public class MainMenuManager : MonoBehaviour
         if(currentVideoIndex < videos.Length){
             currentVideoIndex = currentVideoIndex + 1;
         }
+    }
+
+    //Used to simplify Update a bit
+    //Handles what happens every frame AFTER/POST the starting videos
+    void PostVideo(){
+        
+        //Enable the camera's dolly script to start moving
+        dolly.enabled = true;
+        cameraOverlay.FadeOut(); //Fade out the black camera overlay
     }
 }

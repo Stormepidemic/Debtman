@@ -18,6 +18,8 @@ public class LevelData : MonoBehaviour
     private Boolean contractCollected;
     [SerializeField] private float cameraProjectedMovementOffset; //How much should the player's input vector be rotated along the Camera's Y axis? 100 = complete match, 0 = no match.
 
+    private int destructableTotal; //The total of every object that contributes to this level's Destruction %
+
     private GameManager manager;
     // Start is called before the first frame update
     void Start()
@@ -25,6 +27,7 @@ public class LevelData : MonoBehaviour
         manager = GameObject.Find("GameManager").GetComponent<GameManager>();
         InitalizeLevelState();
         items = new List<GameObject>();
+        SumLevelDestructableWeights();
     }
 
     // Update is called once per frame
@@ -84,6 +87,26 @@ public class LevelData : MonoBehaviour
             activeCheckpoint = checkpoints[checkpointIndex];
             manager.GetComponent<GameManager>().HandleCheckpoint(activeCheckpoint.GetPlayerCheckPointSpawn(), activeCheckpoint.GetCameraCheckPointSpawn());
         }
+    }
+
+    //Sum together all Destruction Weights held by Destructables & Enemies in the level
+    private void SumLevelDestructableWeights(){
+        //Sum together the Destructables
+        Destructable[] destructables = FindObjectsOfType<Destructable>();
+        //Enemy[] enemies = FindObjectsOfType<Enemy>();
+        EnemyBase[] enemies = FindObjectsOfType<EnemyBase>();
+        foreach(Destructable des in destructables){
+            destructableTotal += des.GetDestructionWeight();
+        }
+        //foreach(Enemy eni in enemies){
+        foreach(EnemyBase eni in enemies){
+            destructableTotal += eni.GetDestructionWeight();
+        }
+    }
+
+    //Get the amount of objects in the level which contain a Destruction Weight (Enemy or Destructable)
+    public int GetDestructionTotal(){
+        return destructableTotal;
     }
 
 }

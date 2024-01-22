@@ -9,7 +9,7 @@ EditorBuildSettings:
     path: Assets/Scenes/TitleMenu_0.unity
     guid: 59a0595909b478f4693994015099635a
   - enabled: 1
-    path: Assets/Scenes/W0/Demo_2.unity
+    path: Assets/Scenes/Hub.unity
     guid: b6bb51c6dd0954e49b7c3c0e472bef92
   - enabled: 1
     path: Assets/Scenes/W0/Demo_0.unity
@@ -20,6 +20,13 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/SampleScene.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
+  - enabled: 1
+    path: Assets/Scenes/W0/Demo_3.unity
+    guid: b9d9c471ce6e7f842aeee442a8e2a695
+  - enabled: 1
+    path: Assets/Scenes/W0/Demo_4.unity
+    guid: 733f4b147a2c5c740be4471bd7c2bbf4
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: 651875493fb628e4a8b7317cb81304c9,
       type: 2}
+  m_UseUCBPForAssetBundles: 0

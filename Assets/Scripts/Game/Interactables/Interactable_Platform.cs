@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Interactable_Platform : Interactible
+public class Interactable_Platform : Interactable
 {
     private bool activated;
     [SerializeField] private GameObject[] pathPoints;
@@ -20,11 +20,11 @@ public class Interactable_Platform : Interactible
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         if(moving && activated){
             //Vector3 platformPos = gameObject.transform.position;
-            //gameObject.transform.position = Vector3.Lerp(pathPoints[pathIndex-1].transform.position, nextPoint.transform.position, Time.deltaTime*speed);
+            //Vector3 smooth = Vector3.Lerp(gameObject.transform.position, nextPoint.transform.position, Time.deltaTime);
             gameObject.transform.position = Vector3.MoveTowards(gameObject.transform.position, nextPoint.transform.position, Time.deltaTime*speed);
             if(Vector3.Distance(gameObject.transform.position, nextPoint.transform.position) < 0.1f){
                 if(pathIndex+1 < pathPoints.Length){
@@ -41,7 +41,7 @@ public class Interactable_Platform : Interactible
     public override void Activate(){
         activated = true;
         moving = true;
-        GameObject.Find("GameManager").GetComponent<GameManager>().PopulateDisabledObjects("interactible", gameObject);
+        GameObject.Find("GameManager").GetComponent<GameManager>().PopulateDisabledObjects("interactable", gameObject);
         nextPoint = pathPoints[1]; //The first target point is set
         pathIndex = 1; 
     }

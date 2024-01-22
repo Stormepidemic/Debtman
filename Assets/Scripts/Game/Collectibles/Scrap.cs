@@ -67,17 +67,19 @@ public class Scrap : MonoBehaviour
         
     }
 
-    void OnTriggerEnter(){
-        if(player == null){
-            player = GameObject.FindGameObjectsWithTag("Target")[0];
+    void OnTriggerEnter(Collider other){
+        if(other.gameObject.tag.Contains("Player")){
+            if(player == null){
+                player = GameObject.FindGameObjectsWithTag("Target")[0];
+            }
+
+            sound.pitch = UnityEngine.Random.Range(0.75f, 1.0f);
+            sound.Play();
+
+            collected = true;
+            trail.SetActive(true);
+            Destroy(GetComponent<BoxCollider>()); //removes the collider from the object
         }
-
-        sound.pitch = UnityEngine.Random.Range(0.75f, 1.0f);
-        sound.Play();
-
-        collected = true;
-        Destroy(GetComponent<BoxCollider>()); //removes the collider from the object
-        trail.SetActive(true);
     }
 
     public void SetSpawned(Boolean spawned){

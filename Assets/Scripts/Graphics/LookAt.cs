@@ -5,16 +5,20 @@ using UnityEngine;
 public class LookAt : MonoBehaviour
 {
     [SerializeField] private GameObject target;
+    [SerializeField] private Vector3 upVector = -Vector3.up;
+    [SerializeField] private float x = 90.0f, y = 0.0f, z = 0.0f;
 
     void Start(){
-        target = GameObject.FindGameObjectsWithTag("Player")[0];
+        target = GameObject.Find("Player_Character");
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
-        target = GameObject.FindGameObjectsWithTag("Player")[0];
-        gameObject.transform.LookAt(target.transform, -Vector3.up);
-        gameObject.transform.Rotate(90.0f, 0.0f, 0.0f, Space.Self);
+        if(target == null){
+            target = GameObject.Find("Player_Character");
+        }
+        gameObject.transform.LookAt(target.transform, upVector);
+        gameObject.transform.Rotate(x, y, z, Space.Self);
     }
 }

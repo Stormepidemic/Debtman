@@ -9,7 +9,7 @@ public class SpinRotator : MonoBehaviour
     void Update()
     {
         if(Time.timeScale > 0){
-            gameObject.transform.Rotate(0.0f, 0.0f, 100.0f, Space.Self);
+            gameObject.transform.Rotate(0.0f, 0.0f, 40.0f, Space.Self);
         }
     }
 }

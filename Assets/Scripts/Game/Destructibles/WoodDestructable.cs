@@ -29,7 +29,7 @@ public class WoodDestructable : Destructable
                 //this.Break();
                 model.GetComponent<Animator>().SetBool("Broken", true);
                 //Break();
-                spawnCollectibles();
+                spawnCollectibles(true);
                 onFire = false;
                 frameCounter = 0;
                 spreadBox.SetActive(false);
@@ -50,8 +50,8 @@ public class WoodDestructable : Destructable
         }
     }
 
-    public override void spawnCollectibles(){
-        breakBox.GetComponent<DestroyDestructible>().spawnCollectibles();
+    public override void spawnCollectibles(bool autoCollect){
+        breakBox.GetComponent<DestroyDestructible>().spawnCollectibles(autoCollect);
     }
 
     public override void Break(){

@@ -5,7 +5,7 @@ using System;
 
 public class ResetInteractable : ResettableElement
 {
-    [SerializeField] private Interactible interactableObject;
+    [SerializeField] private Interactable interactableObject;
     private Boolean activated;
 
     public override void ResetElement(){

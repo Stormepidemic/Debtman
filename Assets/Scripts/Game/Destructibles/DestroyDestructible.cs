@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class DestroyDestructible : Destructable
 {
-    [SerializeField] private int scrapValue;
+    //[SerializeField] private int scrapValue;
     [SerializeField] private GameObject model;
     private Animator anim;
     [SerializeField] private float destroyTime;
@@ -30,7 +30,7 @@ public class DestroyDestructible : Destructable
     }
 
     void OnTriggerEnter(Collider other){
-        if(other.gameObject.tag =="PlayerDealDamageToEnemy" || other.gameObject.tag == "Explosion"){
+        if(other.gameObject.tag =="PlayerDealDamageToEnemy" || other.gameObject.tag == "Explosion" || other.gameObject.tag == "HeadHit"){
             anim.SetBool("Broken", true);
             //Break();
             //gameObject.transform.parent.gameObject.GetComponent<Collider>().enabled = false; //Disables the hitbox
@@ -39,29 +39,33 @@ public class DestroyDestructible : Destructable
             particles.Play(); //Play the particle effects
             sound.Play();
             broken = true;
-            spawnCollectibles();
+            spawnCollectibles(false);
         }
         
     }
 
-    public override void spawnCollectibles(){
+    public override void spawnCollectibles(bool autoCollect){
         for(int i = 0; i < scrapValue; i++){
             float x = Random.Range(0-collectibleSpread,collectibleSpread);
             float z = Random.Range(0-collectibleSpread,collectibleSpread);
             GameObject scrap = Instantiate(collectiblePrefab, new Vector3(transform.position.x + x,transform.position.y + yOffset,transform.position.z + z), Quaternion.identity);
-            scrap.GetComponent<Scrap>().SetSpawned(true);
-            scrap.GetComponent<Scrap>().SetCollected(true);
+            scrap.GetComponent<ScrapV2>().SetSpawned(true);
+            scrap.GetComponent<ScrapV2>().SetCollected(autoCollect);
         }
     }
 
     public override void Break(){
         
-        //GameObject.Find("GameManager").GetComponent<GameManager>().PopulateDisabledObjects("destructible", gameObject);
+        GameObject.Find("GameManager").GetComponent<GameManager>().IncrementDestruction(destructionWeight);
         
         Destroy(gameObject.transform.parent.gameObject);
     }
 
     public override void Ignite(){
         //NOTHING!
+    }
+
+    public bool isBroken(){
+        return broken;
     }
 }

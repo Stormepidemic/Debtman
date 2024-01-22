@@ -16,13 +16,13 @@ public class Geo0 : Enemy
     [SerializeField] GameObject enemyModel;
     [SerializeField] GameObject[] aliveEffects;
     [SerializeField] GameObject destroyLight;
-    bool alive = true;
     // Start is called before the first frame update
     void Start()
     {
         startPoint.GetComponent<Renderer>().enabled = false;
         endPoint.GetComponent<Renderer>().enabled = false;
         distanceBetweenPoints = Vector3.Distance(startPoint.transform.position, endPoint.transform.position);
+        alive = true;
     }
 
     // Update is called once per frame
@@ -56,22 +56,21 @@ public class Geo0 : Enemy
         isMove = true;
     }
 
-    public override void kill(){
+    public override void kill(string type){
         deadModel.SetActive(true);
         isMove = false;
-        alive = false;
         
         //Play particle effects
-        GameObject player = GameObject.FindGameObjectsWithTag("Player")[0];
+        GameObject player = GameObject.Find("Player_Character");
         foreach(Rigidbody part in bodyParts){
             //part.AddExplosionForce(10.0f, part.gameObject.transform.position, 1.0f, 1.0f, ForceMode.Impulse);
             part.AddForceAtPosition((part.gameObject.transform.position - player.transform.position)*200, part.transform.position);
-            
-            
         }
         foreach(GameObject effect in aliveEffects){
             effect.SetActive(false);
         }
+        alive = false;
+        GameObject.Find("GameManager").GetComponent<GameManager>().IncrementDestruction(destructionWeight);
         enemyModel.SetActive(false);
         Destroy(destroyLight, 0.5f);
 

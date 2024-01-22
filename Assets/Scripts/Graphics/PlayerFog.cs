@@ -16,7 +16,7 @@ public class PlayerFog : MonoBehaviour
     void Update()
     {
         if(player == null){
-            player = GameObject.FindGameObjectsWithTag("Player")[0];
+            player = GameObject.Find("Player_Character");
         }else{
             if(transform.position != currentPosition){
                 transform.position = player.transform.position;

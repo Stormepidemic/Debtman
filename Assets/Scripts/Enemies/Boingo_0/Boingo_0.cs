@@ -20,7 +20,7 @@ public class Boingo_0 : ActivatableEnemy
 
     }
 
-    public override void kill(){
+    public override void Kill(string type){
 
     }
 }

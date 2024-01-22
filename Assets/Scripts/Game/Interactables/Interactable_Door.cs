@@ -3,28 +3,25 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-public class Interactable_Door : Interactible
+public class Interactable_Door : Interactable
 {
     Boolean activated;
     [SerializeField] Animator anim;
     [SerializeField] AudioSource sound;
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    [SerializeField] ParticleSystem[] effects;
 
     public override void Activate(){
-        activated = true;
+        
+        if(sound != null && !activated){
+            sound.Play();
+        }
+        if(effects != null && effects.Length > 0 && !activated){
+            PlayEffects();
+        }
         anim.SetBool("Open", true);
-        sound.Play();
-        GameObject.Find("GameManager").GetComponent<GameManager>().PopulateDisabledObjects("interactible", gameObject);
+
+        GameObject.Find("GameManager").GetComponent<GameManager>().PopulateDisabledObjects("interactable", gameObject);
+        activated = true;
     }
 
     public override void Deactivate(){
@@ -38,8 +35,14 @@ public class Interactable_Door : Interactible
     }
 
     void OnTriggerEnter(Collider other){
-        if(other.gameObject.tag == "Player"){
+        if(other.gameObject.tag == "Player" && !activated){
             Activate();
+        }
+    }
+
+    void PlayEffects(){
+        foreach(ParticleSystem effect in effects){
+            effect.Play();
         }
     }
 }

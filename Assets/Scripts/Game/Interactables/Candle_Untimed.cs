@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-public class Candle_Untimed : Interactible
+public class Candle_Untimed : Interactable
 {
     [SerializeField] private GameObject[] activatableObjects;
     [SerializeField] private GameObject[] effects;
@@ -46,7 +46,7 @@ public class Candle_Untimed : Interactible
             obj.SetActive(true);
         }
         gameObject.GetComponent<Collider>().enabled = false; //Disable the trigger
-        GameObject.Find("GameManager").GetComponent<GameManager>().PopulateDisabledObjects("interactible", gameObject);
+        GameObject.Find("GameManager").GetComponent<GameManager>().PopulateDisabledObjects("interactable", gameObject);
     }
 
     public override void Deactivate(){
